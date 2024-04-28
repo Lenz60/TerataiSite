@@ -8,59 +8,35 @@
             </div>
             <div class="border-2 border-red-400 m-2">
                 <div class="border-2 border-cyan-400 m-2 flex flex-row">
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            Likewise the innovational path that we have chosen
-                            requires the analysis of forms of influence.
-                        </p>
-                    </div>
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            Likewise the innovational path that we have chosen
-                            requires the analysis of forms of influence.
-                        </p>
-                    </div>
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            Likewise the innovational path that we have chosen
-                            requires the analysis of forms of influence.
-                        </p>
-                    </div>
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            Likewise the innovational path that we have chosen
-                            requires the analysis of forms of influence.
-                        </p>
+                    <div
+                        v-for="furniture in furnitures"
+                        class="border-2 border-green-500 m-2 w-[500px] flex flex-col items-center justify-center"
+                    >
+                        <div>
+                            <img
+                                :src="image + furniture.image"
+                                alt=""
+                                class="w-[100px] h-[100px]"
+                            />
+                            <h2 class="p-2">${{ furniture.price }}</h2>
+                            <h1 class="p-2">{{ furniture.description }}</h1>
+                        </div>
                     </div>
                 </div>
                 <div class="border-2 border-cyan-400 m-2 flex flex-row">
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            On the other hand the innovational path that we have
-                            chosen significantly conditions the creation of new
-                            propositions.
-                        </p>
-                    </div>
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            On the other hand the innovational path that we have
-                            chosen significantly conditions the creation of new
-                            propositions.
-                        </p>
-                    </div>
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            On the other hand the innovational path that we have
-                            chosen significantly conditions the creation of new
-                            propositions.
-                        </p>
-                    </div>
-                    <div class="border-2 border-green-500 m-2">
-                        <p>
-                            On the other hand the innovational path that we have
-                            chosen significantly conditions the creation of new
-                            propositions.
-                        </p>
+                    <div
+                        v-for="furniture in furnitures"
+                        class="border-2 border-green-500 m-2 w-[500px] flex flex-col items-center justify-center"
+                    >
+                        <div>
+                            <img
+                                :src="image + furniture.image"
+                                alt=""
+                                class="w-[100px] h-[100px]"
+                            />
+                            <h2 class="p-2">${{ furniture.price }}</h2>
+                            <h1 class="p-2">{{ furniture.description }}</h1>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,8 +46,10 @@
 
 <script>
 export default {
+    props: ["furnitures"],
     setup() {
-        return {};
+        const image = "http://inventory.test/storage/";
+        return { image };
     },
 };
 </script>
