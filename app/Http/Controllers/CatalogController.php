@@ -17,5 +17,9 @@ class CatalogController extends Controller
         return Inertia::render('Catalog', ['furnitures' => $furniture]);
     }
 
+    public function cart(Request $request){
+        // dd($request->all());
+    }
+
 
 }

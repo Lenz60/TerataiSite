@@ -26,7 +26,9 @@ Route::get('/', function () {
     ]);
 });
 
+
 Route::get('/catalog',[CatalogController::class, 'index'])->name('catalog.index');
+Route::post('/catalog',[CatalogController::class, 'cart'])->name('catalog.cart');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

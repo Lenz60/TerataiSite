@@ -7,7 +7,36 @@
                 <h1>This is a Title</h1>
             </div>
             <div class="border-2 border-red-400 m-2">
-                <div class="border-2 border-cyan-400 m-2 flex flex-row">
+                <div
+                    class="border-2 border-cyan-400 m-2 items-center justify-content-center flex flex-wrap"
+                >
+                    <div
+                        v-for="furniture in furnitures"
+                        class="border-2 border-green-500 w-fit m-2 p-5 flex flex-col"
+                    >
+                        <div>
+                            <img
+                                :src="image + furniture.image"
+                                alt=""
+                                class="w-[100px] h-[100px]"
+                            />
+                            <h2 class="p-2">${{ furniture.price }}</h2>
+                            <h1 class="p-2">{{ furniture.description }}</h1>
+                            <button
+                                @click="
+                                    addToCart(
+                                        furniture.uuid,
+                                        furniture.description
+                                    )
+                                "
+                                class="btn btn-success rounded-md p-2"
+                            >
+                                Add to cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="border-2 border-cyan-400 m-2 flex flex-row">
                     <div
                         v-for="furniture in furnitures"
                         class="border-2 border-green-500 m-2 w-[500px] flex flex-col items-center justify-center"
@@ -22,36 +51,52 @@
                             <h1 class="p-2">{{ furniture.description }}</h1>
                         </div>
                     </div>
-                </div>
-                <div class="border-2 border-cyan-400 m-2 flex flex-row">
-                    <div
-                        v-for="furniture in furnitures"
-                        class="border-2 border-green-500 m-2 w-[500px] flex flex-col items-center justify-center"
-                    >
-                        <div>
-                            <img
-                                :src="image + furniture.image"
-                                alt=""
-                                class="w-[100px] h-[100px]"
-                            />
-                            <h2 class="p-2">${{ furniture.price }}</h2>
-                            <h1 class="p-2">{{ furniture.description }}</h1>
-                        </div>
-                    </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { router } from "@inertiajs/vue3";
+import Swal from "sweetalert2";
 export default {
     props: ["furnitures"],
     setup() {
         const image = "http://inventory.test/storage/";
         return { image };
     },
+    methods: {
+        addToCart(uuid, desc) {
+            // console.log(uuid, desc);
+            Swal.fire({
+                text: desc + " added to cart",
+                target: "#custom-target",
+                customClass: {
+                    container: "position-absolute",
+                },
+                confirmButtonColor: "#049806",
+                toast: true,
+                position: "bottom-right",
+                timer: 2000, // 3000 milliseconds (3 seconds)
+                timerProgressBar: true, // Display a progress bar
+                showConfirmButton: false,
+            });
+            router.post(route("catalog.cart"), {
+                _method: "post",
+                uuid: uuid,
+                description: desc,
+            });
+        },
+    },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+#custom-target {
+    position: relative;
+    width: 600px;
+    height: 300px;
+    border-style: solid;
+}
+</style>
