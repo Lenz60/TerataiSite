@@ -50,9 +50,9 @@
                 >
                     <div
                         v-for="furniture in furnitures"
-                        class="border-2 border-green-300 card rounded-md items-center h-fit shadow-sm hover:shadow-xl w-auto m-2 p-5 flex flex-col"
+                        class="border-2 border-green-300 card rounded-md items-center text-center h-fit shadow-sm hover:shadow-xl w-auto m-2 p-5 flex flex-col"
                     >
-                        <div class="">
+                        <div class="items-center">
                             <img
                                 :src="image + furniture.image"
                                 alt=""
