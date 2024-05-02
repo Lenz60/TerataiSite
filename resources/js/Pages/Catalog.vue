@@ -1,11 +1,9 @@
 <template>
     <Navbar></Navbar>
-    <div
-        class="border-2 border-green-400 m-2 items-center flex flex-col bg-base-100"
-    >
+    <div class="m-2 items-center flex flex-col bg-base-100">
         <!-- Hero -->
-        <div class="bg-accent flex w-full flex-col border-2 border-black">
-            <div class="w-[60%] m-5 text-wrap border-2 border-cyan-300">
+        <div class="bg-success text-neutral-content flex w-full flex-col">
+            <div class="w-[60%] m-5 text-wrap">
                 <h1 class="indent-8 text-5xl p-2 font-semibold">Catalog</h1>
                 <p class="p-2 indent-5">
                     The diverse and plentiful experience the understanding of
@@ -19,38 +17,69 @@
                 </p>
             </div>
         </div>
-        <div class="border-2 border-black m-2 flex flex-col w-full">
+        <div class="m-2 flex flex-col w-full">
             <div class="flex flex-row items-center justify-center">
-                <div
-                    class="border-2 m-2 card rounded-md p-2 text-wrap border-black w-fit h-fit"
-                >
-                    <h1 class="text-3xl w-fit">Indoor Furniture</h1>
+                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                    <Link :href="route('catalog.index')">
+                        <button class="btn btn-accent h-fit w-fit">
+                            <h1 class="text-3xl w-fit h-fit">All</h1>
+                        </button>
+                    </Link>
                 </div>
-                <div
-                    class="border-2 m-2 card rounded-md p-2 text-wrap border-black w-fit h-fit"
-                >
-                    <h1 class="text-3xl w-fit">Outdoor Furniture</h1>
+                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                    <Link
+                        :href="
+                            route('catalog.filtered', { category: 'indoor' })
+                        "
+                    >
+                        <button class="btn btn-neutral h-fit w-fit">
+                            <h1 class="text-3xl w-fit">Indoor Furniture</h1>
+                        </button>
+                    </Link>
                 </div>
-                <div
-                    class="border-2 m-2 card rounded-md p-2 text-wrap border-black w-fit h-fit"
-                >
-                    <h1 class="text-3xl w-fit">Handicraft Furniture</h1>
+                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                    <Link
+                        :href="
+                            route('catalog.filtered', { category: 'outdoor' })
+                        "
+                    >
+                        <button class="btn btn-neutral h-fit w-fit">
+                            <h1 class="text-3xl w-fit">Outdoor Furniture</h1>
+                        </button>
+                    </Link>
                 </div>
-                <div
-                    class="border-2 m-2 card rounded-md p-2 text-wrap border-black w-fit h-fit"
-                >
-                    <h1 class="text-3xl w-fit">Root Furniture</h1>
+                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                    <Link
+                        :href="
+                            route('catalog.filtered', {
+                                category: 'handicraft',
+                            })
+                        "
+                    >
+                        <button class="btn btn-neutral h-fit w-fit">
+                            <h1 class="text-3xl w-fit">Handicraft Furniture</h1>
+                        </button>
+                    </Link>
+                </div>
+                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                    <Link
+                        :href="route('catalog.filtered', { category: 'root' })"
+                    >
+                        <button class="btn btn-neutral h-fit w-fit">
+                            <h1 class="text-3xl w-fit">Root Furniture</h1>
+                        </button>
+                    </Link>
                 </div>
             </div>
             <div
-                class="border-2 border-red-400 bg-base-100 h-full w-auto m-2 card shadow-md rounded-md"
+                class="bg-base-200 h-full text-accent-content w-auto m-2 card shadow-xl rounded-md"
             >
                 <div
-                    class="border-2 w-auto h-full grid grid-cols-4 gap-2 grid-rows-2 border-cyan-400 m-2"
+                    class="w-auto h-full grid grid-cols-4 gap-2 grid-rows-2 m-2"
                 >
                     <div
                         v-for="furniture in furnitures"
-                        class="border-2 border-green-300 card rounded-md items-center text-center h-fit shadow-sm hover:shadow-xl w-auto m-2 p-5 flex flex-col"
+                        class="card rounded-md items-center text-center h-fit shadow-sm hover:shadow-xl hover:border-2 hover:border-neutral w-auto m-2 p-5 flex flex-col"
                     >
                         <div class="items-center">
                             <img
@@ -58,10 +87,13 @@
                                 alt=""
                                 class="w-[100px] h-[100px]"
                             />
-                            <h2 class="p-2">${{ furniture.price }}</h2>
-                            <h1 class="p-2 text-wrap">
+                            <h1 class="p-1 text-wrap">
                                 {{ furniture.description }}
                             </h1>
+                            <h1 class="p-1 text-wrap">
+                                Ready stock : {{ furniture.stock }}
+                            </h1>
+                            <h2 class="p-1">${{ furniture.price }}</h2>
                             <button
                                 @click="
                                     addToCart(
@@ -107,13 +139,14 @@
 <script>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Navbar from "@/Components/Home/Navbar.vue";
-import { router } from "@inertiajs/vue3";
+import { router, Link } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 export default {
     props: ["furnitures"],
     components: {
         AuthenticatedLayout,
         Navbar,
+        Link,
     },
     setup() {
         const image = "http://inventory.test/storage/";
