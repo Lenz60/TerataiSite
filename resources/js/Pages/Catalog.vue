@@ -19,7 +19,7 @@
                 </p>
             </div>
         </div>
-        <div class="border-2 border-blue-400 m-2 flex flex-col w-full">
+        <div class="border-2 border-black m-2 flex flex-col w-full">
             <div class="flex flex-row items-center justify-center">
                 <div
                     class="border-2 m-2 card rounded-md p-2 text-wrap border-black w-fit h-fit"
@@ -42,22 +42,26 @@
                     <h1 class="text-3xl w-fit">Root Furniture</h1>
                 </div>
             </div>
-            <div class="border-2 border-red-400 m-2">
+            <div
+                class="border-2 border-red-400 bg-base-100 h-full w-auto m-2 card shadow-md rounded-md"
+            >
                 <div
-                    class="border-2 border-cyan-400 m-2 items-center justify-content-center flex flex-wrap"
+                    class="border-2 w-auto h-full grid grid-cols-4 gap-2 grid-rows-2 border-cyan-400 m-2"
                 >
                     <div
                         v-for="furniture in furnitures"
-                        class="border-2 border-green-500 w-fit m-2 p-5 flex flex-col"
+                        class="border-2 border-green-300 card rounded-md items-center h-fit shadow-sm hover:shadow-xl w-auto m-2 p-5 flex flex-col"
                     >
-                        <div>
+                        <div class="">
                             <img
                                 :src="image + furniture.image"
                                 alt=""
                                 class="w-[100px] h-[100px]"
                             />
                             <h2 class="p-2">${{ furniture.price }}</h2>
-                            <h1 class="p-2">{{ furniture.description }}</h1>
+                            <h1 class="p-2 text-wrap">
+                                {{ furniture.description }}
+                            </h1>
                             <button
                                 @click="
                                     addToCart(
@@ -71,6 +75,13 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                <div class="join justify-center items-center m-2">
+                    <button class="join-item btn">1</button>
+                    <button class="join-item btn">2</button>
+                    <button class="join-item btn btn-disabled">...</button>
+                    <button class="join-item btn">99</button>
+                    <button class="join-item btn">100</button>
                 </div>
                 <!-- <div class="border-2 border-cyan-400 m-2 flex flex-row">
                         <div
