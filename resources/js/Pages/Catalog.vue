@@ -133,6 +133,7 @@
                     </div> -->
             </div>
         </div>
+        <div class="text-neutral-focus" id="custom-target"></div>
     </div>
 </template>
 
@@ -142,37 +143,63 @@ import Navbar from "@/Components/Home/Navbar.vue";
 import { router, Link } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 export default {
-    props: ["furnitures"],
+    props: ["furnitures", "user"],
     components: {
         AuthenticatedLayout,
         Navbar,
         Link,
     },
-    setup() {
+    setup(props) {
         const image = "http://inventory.test/storage/";
-        return { image };
+        const user = props.user;
+        // console.log(state);
+        return { image, user };
     },
     methods: {
-        addToCart(uuid, desc) {
+        async addToCart(uuid, desc) {
+            // console.log(this.user);
+            if (this.user) {
+                Swal.fire({
+                    text: desc + " added to cart",
+                    target: "#custom-target",
+                    customClass: {
+                        container: "position-absolute",
+                    },
+                    confirmButtonColor: "#049806",
+                    toast: true,
+                    position: "bottom-right",
+                    timer: 2000, // 3000 milliseconds (3 seconds)
+                    timerProgressBar: true, // Display a progress bar
+                    showConfirmButton: false,
+                });
+                router.post(route("catalog.cart"), {
+                    _method: "post",
+                    uuid: uuid,
+                    description: desc,
+                });
+            } else {
+                const result = await Swal.fire({
+                    title: "You are not logged in",
+                    text: "If you want to add this item to your cart, please login first",
+                    icon: "info",
+                    reverseButtons: true,
+                    showConfirmButton: true,
+                    showCancelButton: false,
+                    cancelButtonColor: "#499380",
+                    confirmButtonColor: "#0B1C11",
+                    cancelButtonText: "",
+                    confirmButtonText: "Login",
+                    allowOutsideClick: true,
+                });
+                if (result.isConfirmed) {
+                    // VueCookies.set("offlineState", "true");
+                    router.get(route("login"));
+                } else {
+                    // location.reload();
+                }
+            }
+            // console.log(this.state);
             // console.log(uuid, desc);
-            Swal.fire({
-                text: desc + " added to cart",
-                target: "#custom-target",
-                customClass: {
-                    container: "position-absolute",
-                },
-                confirmButtonColor: "#049806",
-                toast: true,
-                position: "bottom-right",
-                timer: 2000, // 3000 milliseconds (3 seconds)
-                timerProgressBar: true, // Display a progress bar
-                showConfirmButton: false,
-            });
-            router.post(route("catalog.cart"), {
-                _method: "post",
-                uuid: uuid,
-                description: desc,
-            });
         },
     },
 };
