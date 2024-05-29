@@ -36,6 +36,12 @@ class CatalogController extends Controller
         ->where('uuid', $payloadFurniture)
         ->first();
 
+        if($request->preorder){
+            $qty = 0;
+        }else{
+            $qty = 1;
+        }
+
         // dd($furnitureSelected);
 
         // $cart = DB::table('cart');
@@ -45,7 +51,7 @@ class CatalogController extends Controller
             'id' => fake()->uuid(),
             'user_id' => $user->uuid,
             'furniture_id' => $payloadFurniture,
-            'qty' => 1,
+            'qty' => $qty,
             'total_price' => $furnitureSelected->price
         ]);
     }

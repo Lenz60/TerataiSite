@@ -28,7 +28,17 @@
                                     class="flex flex-col text-center justify-center"
                                 >
                                     <!-- <h1>Table 1</h1> -->
-                                    <h1>{{ cart.description }}</h1>
+                                    <div v-if="cart.qty == 0">
+                                        <h1 class="text-bold font-semibold">
+                                            [Pre Order]
+                                        </h1>
+                                        <h1>
+                                            {{ cart.description }}
+                                        </h1>
+                                    </div>
+                                    <div v-else>
+                                        <h1>{{ cart.description }}</h1>
+                                    </div>
                                 </div>
                             </div>
                             <div

@@ -98,7 +98,8 @@
                                 @click="
                                     addToCart(
                                         furniture.uuid,
-                                        furniture.description
+                                        furniture.description,
+                                        furniture.stock
                                     )
                                 "
                                 class="btn btn-success rounded-md p-2"
@@ -159,7 +160,7 @@ export default {
         return { image, user };
     },
     methods: {
-        async addToCart(uuid, desc) {
+        async addToCart(uuid, desc, stock) {
             // console.log(this.user);
             if (this.user) {
                 Swal.fire({
@@ -175,11 +176,19 @@ export default {
                     timerProgressBar: true, // Display a progress bar
                     showConfirmButton: false,
                 });
-                router.post(route("catalog.cart"), {
-                    _method: "post",
-                    uuid: uuid,
-                    description: desc,
-                });
+                if (stock == 0) {
+                    router.post(route("catalog.cart"), {
+                        _method: "post",
+                        uuid: uuid,
+                        preorder: true,
+                    });
+                } else {
+                    router.post(route("catalog.cart"), {
+                        _method: "post",
+                        uuid: uuid,
+                        preorder: false,
+                    });
+                }
             } else {
                 const result = await Swal.fire({
                     title: "You are not logged in",
