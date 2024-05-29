@@ -14,6 +14,7 @@ class CartController extends Controller
         ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
         ->join('users', 'cart.user_id', '=', 'users.uuid')
         ->select('cart.id', 'cart.user_id', 'cart.furniture_id','furniture.image','furniture.description', 'cart.qty','cart.total_price' )
+        ->orderBy('cart.created_at', 'desc')
         ->get();
         // dd($cart);
         // return Inertia::render('Cart');
