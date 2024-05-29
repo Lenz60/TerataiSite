@@ -103,7 +103,10 @@
                                 "
                                 class="btn btn-success rounded-md p-2"
                             >
-                                Add to cart
+                                <div v-if="furniture.stock > 0">
+                                    Add to cart
+                                </div>
+                                <div v-else>Pre order</div>
                             </button>
                         </div>
                     </div>
