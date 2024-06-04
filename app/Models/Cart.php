@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Faker\Factory as Faker;
 
 class Cart extends Model
 {
@@ -15,14 +16,24 @@ class Cart extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id',
         'user_id',
         'furniture_id',
+        'preorder',
         'qty',
         'total_price'
     ];
 
     public function orders(){
         $this->hasMany(Order::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $faker = Faker::create();
+            $model->id = $faker->uuid;
+        });
     }
 }
