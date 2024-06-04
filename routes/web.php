@@ -42,6 +42,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function (){
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'create'])->name('cart.create');
+    Route::delete('/cart',[CartController::class, 'destroy'])->name('cart.destroy');
 });
 
 Route::middleware('auth')->group(function () {
