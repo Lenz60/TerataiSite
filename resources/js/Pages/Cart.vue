@@ -108,7 +108,7 @@
                         <!-- row -->
                     </div>
                     <div
-                        class="w-fill text-center bg-slate-400 p-2 mx-5 rounded-md"
+                        class="w-fill text-center bg-slate-400 p-2 mx-5 my-3 rounded-md"
                     >
                         <div class="hover:cursor-pointer">
                             Total Price : ${{ total }}
