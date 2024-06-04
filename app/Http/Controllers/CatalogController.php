@@ -36,10 +36,12 @@ class CatalogController extends Controller
         ->where('uuid', $payloadFurniture)
         ->first();
 
+        // dd($request->all());
+
         if($request->preorder){
-            $qty = 0;
+            $preorder = true;
         }else{
-            $qty = 1;
+            $preorder = false;
         }
 
         // dd($furnitureSelected);
@@ -47,13 +49,32 @@ class CatalogController extends Controller
         // $cart = DB::table('cart');
         $user = Auth::user();
         // dd($user->uuid);
-        Cart::create([
-            'id' => fake()->uuid(),
-            'user_id' => $user->uuid,
-            'furniture_id' => $payloadFurniture,
-            'qty' => $qty,
-            'total_price' => $furnitureSelected->price
-        ]);
+
+        //Check if the furniture is already in the cart
+        $cart = DB::table('cart')
+        ->where('user_id', $user->uuid)
+        ->where('furniture_id', $payloadFurniture)
+        ->first();
+
+        if($cart){
+            // dd('Exist');
+            $qty = $cart->qty + 1;
+            $total_price = $furnitureSelected->price * $qty;
+            DB::table('cart')
+            ->where('user_id', $user->uuid)
+            ->where('furniture_id', $payloadFurniture)
+            ->update([
+                'qty' => $qty,
+                'total_price' => $total_price
+            ]);
+
+        }else{
+            // dd('Does not exist');
+            $this->createCart($user, $payloadFurniture, $preorder, $furnitureSelected);
+
+        }
+
+
     }
 
     public function indexFiltered(){
@@ -66,6 +87,16 @@ class CatalogController extends Controller
         // dd($request->all());
 
         return Inertia::render('Catalog', ['furnitures' => $furniture]);
+    }
+
+    public function createCart($user, $payloadFurniture, $preorder, $furnitureSelected){
+        Cart::create([
+            'user_id' => $user->uuid,
+            'furniture_id' => $payloadFurniture,
+            'preorder'=> $preorder,
+            'qty' => 1,
+            'total_price' => $furnitureSelected->price
+        ]);
     }
 
 
