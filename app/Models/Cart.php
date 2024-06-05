@@ -23,9 +23,6 @@ class Cart extends Model
         'total_price'
     ];
 
-    public function orders(){
-        $this->hasMany(Order::class);
-    }
 
     protected static function boot()
     {
