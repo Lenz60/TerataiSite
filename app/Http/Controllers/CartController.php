@@ -27,10 +27,23 @@ class CartController extends Controller
     public function destroy(Request $request){
         // dd($request->all());
         // Delete furiture where request->uuid
-        DB::table('cart')
-        ->where('furniture_id', $request->uuid)
-        ->delete();
-        return redirect()->route('cart.index');
+        //Check the request if its array or not, if array proceed to delete multiple items,
+        //
+        if(is_array($request->uuid)){
+            $furnituresId = $request->uuid;
+            foreach ($furnituresId as $furniture){
+                DB::table('cart')
+                ->where('furniture_id', $furniture)
+                ->delete();
+            }
+            return redirect()->route('cart.index');
+        }else{
+            $furnitureId = $request->uuid;
+            DB::table('cart')
+            ->where('furniture_id', $furnitureId)
+            ->delete();
+            return redirect()->route('cart.index');
+        }
 
     }
 
