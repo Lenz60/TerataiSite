@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Faker\Factory as Faker;
 
 class OrdersPayment extends Model
 {
@@ -20,4 +21,13 @@ class OrdersPayment extends Model
         'payment_status'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $faker = Faker::create();
+            $model->id = $faker->uuid;
+        });
+    }
 }

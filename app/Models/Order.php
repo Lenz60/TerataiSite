@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Faker\Factory as Faker;
 
 class Order extends Model
 {
@@ -17,6 +18,7 @@ class Order extends Model
     protected $fillable = [
         'id',
         'cart_id',
+        'track_code',
         'qty',
         'total_price',
     ];
@@ -28,4 +30,14 @@ class Order extends Model
     public function ordersProduction(){
         $this->hasOne(OrdersProduction::class);
     }
+
+    // protected static function boot()
+    // {
+    //     parent::boot();
+
+    //     static::creating(function ($model) {
+    //         $faker = Faker::create();
+    //         $model->id = $faker->uuid;
+    //     });
+    // }
 }
