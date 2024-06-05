@@ -78,7 +78,8 @@
                     class="w-auto h-full grid grid-cols-4 gap-2 grid-rows-2 m-2"
                 >
                     <div
-                        v-for="furniture in furnitures"
+                        v-for="furniture in paginatedFurnitures"
+                        :key="furniture.uuid"
                         class="card rounded-md items-center text-center h-fit shadow-sm hover:shadow-xl hover:border-2 hover:border-neutral w-auto m-2 p-5 flex flex-col"
                     >
                         <div class="items-center">
@@ -113,28 +114,16 @@
                     </div>
                 </div>
                 <div class="join justify-center items-center m-2">
-                    <button class="join-item btn">1</button>
-                    <button class="join-item btn">2</button>
-                    <button class="join-item btn btn-disabled">...</button>
-                    <button class="join-item btn">99</button>
-                    <button class="join-item btn">100</button>
+                    <button
+                        v-for="page in totalPages"
+                        :key="page"
+                        @click="changePage(page)"
+                        :class="{ 'btn-enabled': page === currentPage.value }"
+                        class="join-item btn"
+                    >
+                        {{ page }}
+                    </button>
                 </div>
-                <!-- <div class="border-2 border-cyan-400 m-2 flex flex-row">
-                        <div
-                            v-for="furniture in furnitures"
-                            class="border-2 border-green-500 m-2 w-[500px] flex flex-col items-center justify-center"
-                        >
-                            <div>
-                                <img
-                                    :src="image + furniture.image"
-                                    alt=""
-                                    class="w-[100px] h-[100px]"
-                                />
-                                <h2 class="p-2">${{ furniture.price }}</h2>
-                                <h1 class="p-2">{{ furniture.description }}</h1>
-                            </div>
-                        </div>
-                    </div> -->
             </div>
         </div>
         <div class="text-neutral-focus" id="custom-target"></div>
@@ -146,6 +135,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Navbar from "@/Components/Home/Navbar.vue";
 import { router, Link } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
+import { computed, ref } from "vue";
 export default {
     props: ["furnitures", "user"],
     components: {
@@ -156,8 +146,40 @@ export default {
     setup(props) {
         const image = "http://inventory.test/storage/";
         const user = props.user;
+        // const furnitures = ref(props.furnitures);
+        const currentPage = ref(1);
+        const itemsPerPage = ref(5);
         // console.log(state);
-        return { image, user };
+        // console.log(props.furnitures);
+
+        const paginatedFurnitures = computed(() => {
+            const start = (currentPage.value - 1) * itemsPerPage.value;
+            const end = start + itemsPerPage.value;
+            return props.furnitures.slice(start, end);
+        });
+        const totalPages = computed(() => {
+            const pages = Math.ceil(
+                props.furnitures.length / itemsPerPage.value
+            );
+            // console.log("Total pages:", pages); // Debugging line
+            return pages;
+        });
+
+        const changePage = (page) => {
+            console.log("Changing page to:", page); // Debugging line
+            currentPage.value = page;
+        };
+
+        // console.log("Total pages :" + totalPages.page);
+        return {
+            image,
+            user,
+            currentPage,
+            itemsPerPage,
+            paginatedFurnitures,
+            totalPages,
+            changePage,
+        };
     },
     methods: {
         async addToCart(uuid, desc, stock) {
