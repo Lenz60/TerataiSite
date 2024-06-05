@@ -117,7 +117,9 @@
                     <div
                         class="w-fill text-center bg-green-400 p-2 m-5 rounded-md"
                     >
-                        <div class="hover:cursor-pointer">Checkout</div>
+                        <div @click="checkout()" class="hover:cursor-pointer">
+                            Checkout
+                        </div>
                     </div>
                 </div>
             </div>
@@ -141,25 +143,35 @@ export default {
         const carts = ref(props.carts);
 
         const total = ref(0);
-        console.log(carts);
+
+        const calculateTotal = () => {
+            total.value = carts.value.reduce(
+                (acc, cart) =>
+                    acc + Number(cart.qty) * Number(cart.total_price),
+                0
+            );
+        };
+        // console.log(carts);
 
         watch(
             carts,
             () => {
-                total.value = carts.value.reduce(
-                    (acc, cart) =>
-                        acc + Number(cart.qty) * Number(cart.total_price),
-                    0
-                );
+                calculateTotal();
                 sessionStorage.setItem("carts", JSON.stringify(carts.value));
             },
             { deep: true }
         );
 
         onMounted(() => {
-            const storedCarts = sessionStorage.getItem("carts");
-            if (storedCarts) {
-                carts.value = JSON.parse(storedCarts);
+            try {
+                const storedCarts = JSON.parse(sessionStorage.getItem("carts"));
+                if (storedCarts && storedCarts.length > 0) {
+                    carts.value = storedCarts;
+                } else {
+                    calculateTotal();
+                }
+            } catch (error) {
+                console.log("Error parsing stored carts:", error);
             }
         });
 
@@ -196,6 +208,27 @@ export default {
                 });
             } else {
                 location.reload();
+                // Set the cart.qty based on the furnitureId passed to 1
+                // Set the cart.qty based on the furnitureId passed to 1
+                // this.carts = this.carts.map((cart) => {
+                //     if (cart.furniture_id === furnitureId) {
+                //         cart.qty = 1;
+                //     }
+                //     return cart;
+                // });
+                // // Update sessionStorage with the updated carts value
+                // sessionStorage.setItem("carts", JSON.stringify(this.carts));
+            }
+        },
+        checkout() {
+            const checkout = router.post(route("cart.checkout"), {
+                _method: "post",
+                cart: this.carts,
+                totalPrice: this.total,
+            });
+            console.log(checkout);
+            if (checkout) {
+                sessionStorage.removeItem("carts");
             }
         },
     },
