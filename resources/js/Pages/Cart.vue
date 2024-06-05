@@ -130,10 +130,11 @@
 <script>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { ref, computed, watch, onMounted } from "vue";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
+import { onUpdated } from "vue";
 export default {
-    props: ["carts"],
+    props: ["carts", "checkoutStatus"],
     components: {
         AuthenticatedLayout,
     },
@@ -161,6 +162,18 @@ export default {
             },
             { deep: true }
         );
+
+        onUpdated(() => {
+            if (usePage().props.flash.message == "checkout:200") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Furniture checkout successfully",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                router.get(route("cart.index"));
+            }
+        });
 
         onMounted(() => {
             try {
@@ -208,16 +221,6 @@ export default {
                 });
             } else {
                 location.reload();
-                // Set the cart.qty based on the furnitureId passed to 1
-                // Set the cart.qty based on the furnitureId passed to 1
-                // this.carts = this.carts.map((cart) => {
-                //     if (cart.furniture_id === furnitureId) {
-                //         cart.qty = 1;
-                //     }
-                //     return cart;
-                // });
-                // // Update sessionStorage with the updated carts value
-                // sessionStorage.setItem("carts", JSON.stringify(this.carts));
             }
         },
         checkout() {
