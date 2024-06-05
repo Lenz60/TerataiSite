@@ -171,7 +171,22 @@ export default {
                     showConfirmButton: false,
                     timer: 1500,
                 });
-                router.get(route("cart.index"));
+                // Get all furnitureId in the carts
+                let furnitureIds = carts.value.map((cart) => cart.furniture_id);
+                // Remove all furnitureId in the carts
+                furnitureIds.forEach((furnitureId) => {
+                    carts.value = carts.value.filter(
+                        (cart) => cart.furniture_id !== furnitureId
+                    );
+                });
+                router.post(route("cart.destroy"), {
+                    _method: "delete",
+                    uuid: furnitureIds,
+                });
+                // Update sessionStorage with the updated carts value
+                sessionStorage.setItem("carts", JSON.stringify(carts.value));
+                // Update the total price to 0
+                total.value = 0;
             }
         });
 
