@@ -39,32 +39,27 @@ class CartController extends Controller
         $carts = $request->cart;
         foreach($carts as $cart){
             // dd($cart);
-            $id = fake()->uuid();
             Order::create([
-                'id' => $id,
-                'cart_id' => $cart['id'],
+                'id' => $cart['id'],
                 'track_code' => 'TRK'.rand(1000,9999),
                 'qty' => $cart['qty'],
                 'total_price' => $cart['total_price'],
             ]);
 
             OrdersPayment::create([
-                'order_id' => $id,
+                'order_id' => $cart['id'],
                 'payment_method' => 'pending',
                 'payment_status' => 'pending',
             ]);
 
             OrdersProduction::create([
-                'order_id' => $id,
+                'order_id' => $cart['id'],
                 'production_status' => 'In Production',
             ]);
 
         }
 
-        //redirect to cart.index with payload of a cartCheckout => request->all()
-        // return redirect()->route('cart.index', ['cartCheckout' => $request->all()]);
-        // return Inertia::render('Cart', ['cartCheckout' => $request->all()]);
-        // return response()->json(['status' => 'success'], 200);
+        return redirect()->back()->with('message', 'checkout:200');
 
     }
 }
