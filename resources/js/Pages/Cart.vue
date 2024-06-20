@@ -46,9 +46,7 @@
                                 >
                                     <div class="mb-2">
                                         <!-- <p>$400</p> -->
-                                        <p>
-                                            ${{ cart.total_price * cart.qty }}
-                                        </p>
+                                        <p>${{ cart.total_price }}</p>
                                     </div>
                                     <div class="h-full w-32">
                                         <div
@@ -77,7 +75,11 @@
                                             </div>
                                             <div v-else>
                                                 <button
-                                                    @click="cart.qty--"
+                                                    @click="
+                                                        minQty(
+                                                            cart.furniture_id
+                                                        )
+                                                    "
                                                     class="bg-transparent text-green-600 h-full w-[25px] ml-1.5 rounded-1 cursor-pointer outline-none"
                                                 >
                                                     <span
@@ -92,7 +94,9 @@
                                                 class="input rounded-sm bg-transparent outline-none focus:outline-none text-center w-full h-full font-semibold text-md hover:text-black focus:text-black md:text-basecursor-default flex items-center text-gray-700"
                                             />
                                             <button
-                                                @click="cart.qty++"
+                                                @click="
+                                                    addQty(cart.furniture_id)
+                                                "
                                                 class="bg-transparent text-green-600 h-full w-[25px] mr-1.5 rounded-1 cursor-pointer outline-none"
                                             >
                                                 <span
@@ -144,6 +148,7 @@ export default {
         const carts = ref(props.carts);
 
         const total = ref(0);
+        const totalIndivPrice = ref(0);
 
         const calculateTotal = () => {
             total.value = carts.value.reduce(
@@ -187,6 +192,10 @@ export default {
                 sessionStorage.setItem("carts", JSON.stringify(carts.value));
                 // Update the total price to 0
                 total.value = 0;
+                // // Update total_price of each cart item to totalIndivPrice
+                // carts.value.forEach((cart) => {
+                //     cart.total_price = totalIndivPrice.value;
+                // });
             }
         });
 
@@ -203,9 +212,30 @@ export default {
             }
         });
 
-        return { image, carts, total };
+        return { image, carts, totalIndivPrice, total, calculateTotal };
     },
     methods: {
+        addQty(id) {
+            // TODO: Whenever quantity changes, update it to the database
+            this.carts = this.carts.map((cart) => {
+                if (cart.furniture_id === id) {
+                    cart.qty++;
+                    cart.total_price = cart.price * cart.qty;
+                }
+                return cart;
+            });
+            // console.log(this.carts);
+        },
+        minQty(id) {
+            // TODO: Whenever quantity changes, update it to the database
+            this.carts = this.carts.map((cart) => {
+                if (cart.furniture_id === id && cart.qty > 1) {
+                    cart.qty--;
+                    cart.total_price = cart.price * cart.qty;
+                }
+                return cart;
+            });
+        },
         async removeFromCart(furnitureId, furnitureDesc) {
             const result = await Swal.fire({
                 title: "Confirmation!",
@@ -238,8 +268,9 @@ export default {
                 location.reload();
             }
         },
-        checkout() {
-            const checkout = router.post(route("cart.checkout"), {
+        async checkout() {
+            console.log(this.carts[0].total_price);
+            const checkout = await router.post(route("cart.checkout"), {
                 _method: "post",
                 cart: this.carts,
                 totalPrice: this.total,
