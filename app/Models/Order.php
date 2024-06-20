@@ -18,8 +18,6 @@ class Order extends Model
     protected $fillable = [
         'id',
         'track_code',
-        'qty',
-        'total_price',
     ];
 
     public function ordersPayment(){
