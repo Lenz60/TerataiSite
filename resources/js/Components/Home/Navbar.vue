@@ -3,7 +3,7 @@
         <header class="navbar bg-base-100 shadow-md w-screen">
             <div class="flex-none"></div>
             <div class="flex-1">
-                <a href="/">
+                <a href="/catalog">
                     <img
                         src="/images/logo.png"
                         alt=""
@@ -15,6 +15,24 @@
                 <div v-if="$page.props.auth.user" class="menu flex-row-reverse">
                     <div class="flex">
                         <ul class="menu menu-horizontal px-1">
+                            <div class="mx-2">
+                                <Link :href="route('cart.index')" method="get">
+                                    <div
+                                        class="text-primary indicator p-2 w-full"
+                                    >
+                                        <p
+                                            class="font-semibold font-montserrat break-words"
+                                        >
+                                            Cart
+                                        </p>
+                                        <span
+                                            class="indicator-item text-[12px] rounded-md bg-warning p-0.5 mt-2 font-montserrat text-primary indicator-end"
+                                        >
+                                            {{ CartCount }}
+                                        </span>
+                                    </div>
+                                </Link>
+                            </div>
                             <li>
                                 <details class="text-primary">
                                     <summary>
@@ -91,6 +109,7 @@ export default {
     },
     props: {
         noAuth: Object,
+        CartCount: String,
     },
     setup(props) {
         return {};
