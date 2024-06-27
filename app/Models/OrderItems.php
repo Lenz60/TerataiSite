@@ -20,6 +20,7 @@ class OrderItems extends Model
         'user_id',
         'furniture_id',
         'preorder',
+        'price',
         'qty',
         'total_price'
     ];
