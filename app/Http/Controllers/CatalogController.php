@@ -17,8 +17,11 @@ class CatalogController extends Controller
         ->get();
         $user = Auth::user();
 
+
         if($user){
-            return Inertia::render('Catalog', ['furnitures' => $furniture, 'user' => true]);
+            $cartCounts = DB::table('cart')->where('user_id', $user->uuid)->count();
+            // dd($cartCounts);
+            return Inertia::render('Catalog', ['furnitures' => $furniture, 'user' => true, 'cartCounts' => $cartCounts]);
 
         }else{
             return Inertia::render('Catalog', ['furnitures' => $furniture, 'user' => false]);
@@ -30,19 +33,21 @@ class CatalogController extends Controller
     }
 
     public function cart(Request $request){
+        // dd($request->all());
         // dd($request->uuid);
         $payloadFurniture = $request->uuid;
+        $preorder = $request->preorder;
         $furnitureSelected = DB::table('furniture')
         ->where('uuid', $payloadFurniture)
         ->first();
 
         // dd($request->all());
 
-        if($request->preorder){
-            $preorder = true;
-        }else{
-            $preorder = false;
-        }
+        // if($request->preorder){
+        //     $preorder = true;
+        // }else{
+        //     $preorder = false;
+        // }
 
         // dd($furnitureSelected);
 

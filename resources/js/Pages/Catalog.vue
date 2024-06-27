@@ -1,6 +1,8 @@
 <template>
-    <Navbar></Navbar>
-    <div class="m-2 items-center flex flex-col bg-base-100">
+    <Navbar :CartCount="cartCounts"></Navbar>
+    <div
+        class="m-2 items-center border-2 border-red-400 flex flex-col bg-base-100"
+    >
         <!-- Hero -->
         <div class="bg-success text-neutral-content flex w-full flex-col">
             <div class="w-[60%] m-5 text-wrap">
@@ -19,36 +21,42 @@
         </div>
         <div class="m-2 flex flex-col w-full">
             <div class="flex flex-row items-center justify-center">
-                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                <div
+                    class="m-2 border-2 border-cyan-300 card rounded-md p-2 text-wrap w-fit h-fit"
+                >
                     <Link :href="route('catalog.index')">
-                        <button class="btn btn-accent h-fit w-fit">
-                            <h1 class="text-3xl w-fit h-fit">All</h1>
+                        <button class="btn btn-sm btn-accent h-fit w-fit">
+                            <h1 class="text-xl font-normal w-fit h-fit">All</h1>
                         </button>
                     </Link>
                 </div>
-                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
                     <Link
                         :href="
                             route('catalog.filtered', { category: 'indoor' })
                         "
                     >
-                        <button class="btn btn-neutral h-fit w-fit">
-                            <h1 class="text-3xl w-fit">Indoor Furniture</h1>
+                        <button class="btn btn-sm btn-neutral h-fit w-fit">
+                            <h1 class="text-xl font-normal w-fit">
+                                Indoor Furniture
+                            </h1>
                         </button>
                     </Link>
                 </div>
-                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
                     <Link
                         :href="
                             route('catalog.filtered', { category: 'outdoor' })
                         "
                     >
-                        <button class="btn btn-neutral h-fit w-fit">
-                            <h1 class="text-3xl w-fit">Outdoor Furniture</h1>
+                        <button class="btn btn-sm btn-neutral h-fit w-fit">
+                            <h1 class="text-xl font-normal w-fit">
+                                Outdoor Furniture
+                            </h1>
                         </button>
                     </Link>
                 </div>
-                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
                     <Link
                         :href="
                             route('catalog.filtered', {
@@ -56,23 +64,27 @@
                             })
                         "
                     >
-                        <button class="btn btn-neutral h-fit w-fit">
-                            <h1 class="text-3xl w-fit">Handicraft Furniture</h1>
+                        <button class="btn btn-sm btn-neutral h-fit w-fit">
+                            <h1 class="text-xl font-normal w-fit">
+                                Handicraft Furniture
+                            </h1>
                         </button>
                     </Link>
                 </div>
-                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
+                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
                     <Link
                         :href="route('catalog.filtered', { category: 'root' })"
                     >
-                        <button class="btn btn-neutral h-fit w-fit">
-                            <h1 class="text-3xl w-fit">Root Furniture</h1>
+                        <button class="btn btn-sm btn-neutral h-fit w-fit">
+                            <h1 class="text-xl font-normal w-fit">
+                                Root Furniture
+                            </h1>
                         </button>
                     </Link>
                 </div>
             </div>
             <div
-                class="bg-base-200 h-full text-accent-content w-auto m-2 card shadow-xl rounded-md"
+                class="bg-base-200 border-2 border-green-400 h-full text-accent-content bg-center m-2 mx-10 card shadow-xl rounded-md"
             >
                 <div
                     class="w-auto h-full grid grid-cols-4 gap-2 grid-rows-2 m-2"
@@ -90,6 +102,9 @@
                             />
                             <h1 class="p-1 text-wrap">
                                 {{ furniture.description }}
+                            </h1>
+                            <h1 class="p-1 text-wrap">
+                                Color: {{ furniture.color }}
                             </h1>
                             <h1 class="p-1 text-wrap">
                                 Ready stock : {{ furniture.stock }}
@@ -137,7 +152,7 @@ import { router, Link } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 import { computed, ref } from "vue";
 export default {
-    props: ["furnitures", "user"],
+    props: ["furnitures", "user", "cartCounts"],
     components: {
         AuthenticatedLayout,
         Navbar,
@@ -150,7 +165,8 @@ export default {
         const currentPage = ref(1);
         const itemsPerPage = ref(5);
         // console.log(state);
-        // console.log(props.furnitures);
+        const cartCount = props.cartCounts;
+        console.log(props.cartCounts);
 
         const paginatedFurnitures = computed(() => {
             const start = (currentPage.value - 1) * itemsPerPage.value;
@@ -179,6 +195,7 @@ export default {
             paginatedFurnitures,
             totalPages,
             changePage,
+            cartCount,
         };
     },
     methods: {
@@ -198,7 +215,9 @@ export default {
                     timerProgressBar: true, // Display a progress bar
                     showConfirmButton: false,
                 });
-                if (stock == 0) {
+                console.log(stock);
+                if (stock == "0") {
+                    // console.log(true);
                     router.post(route("catalog.cart"), {
                         _method: "post",
                         uuid: uuid,
