@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use Inertia\Inertia;
 use App\Models\Order;
 use App\Models\OrderItems;
 use App\Models\OrdersPayment;
 use App\Models\OrdersProduction;
-use Inertia\Inertia;
-use Illuminate\Http\Request; // Add this import statement
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request; // Add this import statement
 
 class CartController extends Controller
 {
@@ -17,7 +18,7 @@ class CartController extends Controller
         $cart = DB::table('cart')
         ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
         ->join('users', 'cart.user_id', '=', 'users.uuid')
-        ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.price', 'cart.qty','cart.total_price' )
+        ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.price', 'cart.qty','cart.total_price' )
         ->orderBy('cart.created_at', 'desc')
         ->get();
         // dd($cart);
@@ -51,6 +52,27 @@ class CartController extends Controller
 
     }
 
+    public function change(Request $request){
+        // dd($request->change);
+        $change = $request->change;
+        $cartItem = Cart::find($request->cartId);
+
+        // dd($cartItem);
+        if($cartItem){
+            if($change === 'add'){
+                $cartItem->qty = $cartItem->qty +1;
+                $cartItem->save();
+            }else{
+                $cartItem->qty = $cartItem->qty -1;
+                $cartItem->save();
+            }
+        }else{
+            dd('Not found');
+        }
+        //Return response
+    }
+
+
     public function checkout(Request $request){
         // dd($request->all());
         // dd($request->all());
@@ -78,6 +100,7 @@ class CartController extends Controller
                 'user_id' => $cart['user_id'],
                 'furniture_id'=>$cart['furniture_id'],
                 'preorder'=>$preorder,
+                'price' => $cart['price'],
                 'qty' => $cart['qty'],
                 'total_price' => $cart['total_price'],
                 'track_code' => 'TRK'.rand(1000,9999),

@@ -11,7 +11,11 @@
                     class="flex flex-col bg-base-200 overflow-hidden shadow-sm sm:rounded-lg"
                 >
                     <!-- <div class="p-6 text-gray-900">This is a cart view</div> -->
-                    <div v-for="cart in carts" class="flex flex-col m-1">
+                    <div
+                        v-for="(cart, index) in carts"
+                        :key="index"
+                        class="flex flex-col m-1"
+                    >
                         <div
                             class="flex flex-row w-fill h-fit p-2 bg-white m-2 hover:border-2 hover:border-accent"
                         >
@@ -25,16 +29,18 @@
                                     class="flex flex-col text-center justify-center"
                                 >
                                     <!-- <h1>Table 1</h1> -->
-                                    <div v-if="cart.preorder">
+                                    <div v-if="cart.preorder == 1">
                                         <h1 class="text-bold font-semibold">
                                             [Pre Order]
                                         </h1>
                                         <h1>
                                             {{ cart.description }}
                                         </h1>
+                                        <h1>Color: {{ cart.color }}</h1>
                                     </div>
                                     <div v-else>
                                         <h1>{{ cart.description }}</h1>
+                                        <h1>Color: {{ cart.color }}</h1>
                                     </div>
                                 </div>
                             </div>
@@ -77,6 +83,7 @@
                                                 <button
                                                     @click="
                                                         minQty(
+                                                            cart.id,
                                                             cart.furniture_id
                                                         )
                                                     "
@@ -95,7 +102,10 @@
                                             />
                                             <button
                                                 @click="
-                                                    addQty(cart.furniture_id)
+                                                    addQty(
+                                                        cart.id,
+                                                        cart.furniture_id
+                                                    )
                                                 "
                                                 class="bg-transparent text-green-600 h-full w-[25px] mr-1.5 rounded-1 cursor-pointer outline-none"
                                             >
@@ -142,6 +152,7 @@ export default {
     components: {
         AuthenticatedLayout,
     },
+    filters: {},
     setup(props) {
         // console.log(props.carts[0].qty);
         const image = "http://inventory.test/storage/";
@@ -157,13 +168,21 @@ export default {
                 0
             );
         };
+
         // console.log(carts);
+
+        // TODO: Fix this
+        const formatFilters = computed(() => {
+            return props.carts.filter(
+                (cart) => (cart.total_price = "$" + cart.total_price)
+            );
+        });
 
         watch(
             carts,
             () => {
                 calculateTotal();
-                sessionStorage.setItem("carts", JSON.stringify(carts.value));
+                // sessionStorage.setItem("carts", JSON.stringify(carts.value));
             },
             { deep: true }
         );
@@ -189,7 +208,7 @@ export default {
                     uuid: furnitureIds,
                 });
                 // Update sessionStorage with the updated carts value
-                sessionStorage.setItem("carts", JSON.stringify(carts.value));
+                // sessionStorage.setItem("carts", JSON.stringify(carts.value));
                 // Update the total price to 0
                 total.value = 0;
                 // // Update total_price of each cart item to totalIndivPrice
@@ -200,39 +219,55 @@ export default {
         });
 
         onMounted(() => {
-            try {
-                const storedCarts = JSON.parse(sessionStorage.getItem("carts"));
-                if (storedCarts && storedCarts.length > 0) {
-                    carts.value = storedCarts;
-                } else {
-                    calculateTotal();
-                }
-            } catch (error) {
-                console.log("Error parsing stored carts:", error);
-            }
+            calculateTotal();
+            //Removed local storage, now any changes directly apply to the database
+            // try {
+            //     const storedCarts = JSON.parse(sessionStorage.getItem("carts"));
+            //     if (storedCarts && storedCarts.length > 0) {
+            //         carts.value = storedCarts;
+            //     } else {
+            //         calculateTotal();
+            //     }
+            // } catch (error) {
+            //     console.log("Error parsing stored carts:", error);
+            // }
         });
 
-        return { image, carts, totalIndivPrice, total, calculateTotal };
+        return {
+            image,
+            carts,
+            totalIndivPrice,
+            total,
+            calculateTotal,
+            formatFilters,
+        };
     },
     methods: {
-        addQty(id) {
-            // TODO: Whenever quantity changes, update it to the database
-            this.carts = this.carts.map((cart) => {
-                if (cart.furniture_id === id) {
+        async addQty(cartId, furnitureId) {
+            this.carts = await this.carts.map((cart) => {
+                if (cart.furniture_id === furnitureId) {
                     cart.qty++;
                     cart.total_price = cart.price * cart.qty;
                 }
+                router.post(route("cart.change"), {
+                    _method: "put",
+                    change: "add",
+                    cartId: cartId,
+                });
                 return cart;
             });
-            // console.log(this.carts);
         },
-        minQty(id) {
-            // TODO: Whenever quantity changes, update it to the database
-            this.carts = this.carts.map((cart) => {
-                if (cart.furniture_id === id && cart.qty > 1) {
+        async minQty(cartId, furnitureId) {
+            this.carts = await this.carts.map((cart) => {
+                if (cart.furniture_id === furnitureId && cart.qty > 1) {
                     cart.qty--;
                     cart.total_price = cart.price * cart.qty;
                 }
+                router.post(route("cart.change"), {
+                    _method: "put",
+                    change: "min",
+                    cartId: cartId,
+                });
                 return cart;
             });
         },
@@ -259,7 +294,7 @@ export default {
                     (cart) => cart.furniture_id !== furnitureId
                 );
                 // Update sessionStorage with the updated carts value
-                sessionStorage.setItem("carts", JSON.stringify(this.carts));
+                // sessionStorage.setItem("carts", JSON.stringify(this.carts));
                 router.post(route("cart.destroy"), {
                     _method: "delete",
                     uuid: furnitureId,
@@ -275,10 +310,10 @@ export default {
                 cart: this.carts,
                 totalPrice: this.total,
             });
-            console.log(checkout);
-            if (checkout) {
-                sessionStorage.removeItem("carts");
-            }
+            // console.log(checkout);
+            // if (checkout) {
+            //     sessionStorage.removeItem("carts");
+            // }
         },
     },
 };
