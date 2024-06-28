@@ -3,7 +3,7 @@
         <header class="navbar bg-base-100 shadow-md w-screen">
             <div class="flex-none"></div>
             <div class="flex-1">
-                <a href="/catalog">
+                <a :href="route('catalog.index')">
                     <img
                         src="/images/logo.png"
                         alt=""
@@ -25,11 +25,13 @@
                                         >
                                             Cart
                                         </p>
-                                        <span
-                                            class="indicator-item text-[12px] rounded-md bg-warning p-0.5 mt-2 font-montserrat text-primary indicator-end"
-                                        >
-                                            {{ CartCount }}
-                                        </span>
+                                        <div v-if="CartCount">
+                                            <span
+                                                class="indicator-item text-[12px] rounded-full p-0.5 bg-error mt-2 font-montserrat text-base-100 indicator-end w-4 h-4 flex items-center justify-center"
+                                            >
+                                                {{ CartCount }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </Link>
                             </div>
