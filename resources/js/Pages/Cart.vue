@@ -171,13 +171,6 @@ export default {
 
         // console.log(carts);
 
-        // TODO: Fix this
-        const formatFilters = computed(() => {
-            return props.carts.filter(
-                (cart) => (cart.total_price = "$" + cart.total_price)
-            );
-        });
-
         watch(
             carts,
             () => {
@@ -239,7 +232,6 @@ export default {
             totalIndivPrice,
             total,
             calculateTotal,
-            formatFilters,
         };
     },
     computed: {
@@ -310,20 +302,16 @@ export default {
                     uuid: furnitureId,
                 });
             } else {
-                location.reload();
+                // location.reload();
             }
         },
-        async checkout() {
-            console.log(this.carts[0].total_price);
-            const checkout = await router.post(route("cart.checkout"), {
+        checkout() {
+            // console.log(this.carts[0].total_price);
+            router.post(route("cart.checkout"), {
                 _method: "post",
                 cart: this.carts,
                 totalPrice: this.total,
             });
-            // console.log(checkout);
-            // if (checkout) {
-            //     sessionStorage.removeItem("carts");
-            // }
         },
     },
 };
