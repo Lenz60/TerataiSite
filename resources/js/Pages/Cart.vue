@@ -12,7 +12,7 @@
                 >
                     <!-- <div class="p-6 text-gray-900">This is a cart view</div> -->
                     <div
-                        v-for="(cart, index) in carts"
+                        v-for="(cart, index) in formattedCarts"
                         :key="index"
                         class="flex flex-col m-1"
                     >
@@ -52,7 +52,7 @@
                                 >
                                     <div class="mb-2">
                                         <!-- <p>$400</p> -->
-                                        <p>${{ cart.total_price }}</p>
+                                        <p>{{ cart.total_price }}</p>
                                     </div>
                                     <div class="h-full w-32">
                                         <div
@@ -241,6 +241,16 @@ export default {
             calculateTotal,
             formatFilters,
         };
+    },
+    computed: {
+        formattedCarts() {
+            return this.carts.map((cart) => {
+                return {
+                    ...cart,
+                    total_price: `$${cart.total_price}`,
+                };
+            });
+        },
     },
     methods: {
         async addQty(cartId, furnitureId) {
