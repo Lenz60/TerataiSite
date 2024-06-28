@@ -35,30 +35,29 @@ class CatalogController extends Controller
     public function cart(Request $request){
         // dd($request->all());
         // dd($request->uuid);
-        $payloadFurniture = $request->uuid;
-        $preorder = $request->preorder;
+        // $payloadFurniture = $request->uuid;
+        // $preorder = $request->preorder;
+        $code = $request->code;
+        $color = $request->color;
         $furnitureSelected = DB::table('furniture')
-        ->where('uuid', $payloadFurniture)
+        ->where('code', $code)
+        ->where('color', $color)
         ->first();
-
-        // dd($request->all());
-
-        // if($request->preorder){
-        //     $preorder = true;
-        // }else{
-        //     $preorder = false;
-        // }
-
         // dd($furnitureSelected);
+        $selectedFurnitureId = $furnitureSelected->uuid;
+        if($furnitureSelected->stock == 0){
+            $preorder = true;
+        }else{
+            $preorder = false;
+        }
 
-        // $cart = DB::table('cart');
         $user = Auth::user();
         // dd($user->uuid);
 
         //Check if the furniture is already in the cart
         $cart = DB::table('cart')
         ->where('user_id', $user->uuid)
-        ->where('furniture_id', $payloadFurniture)
+        ->where('furniture_id', $selectedFurnitureId)
         ->first();
 
         if($cart){
@@ -67,7 +66,7 @@ class CatalogController extends Controller
             $total_price = $furnitureSelected->price * $qty;
             DB::table('cart')
             ->where('user_id', $user->uuid)
-            ->where('furniture_id', $payloadFurniture)
+            ->where('furniture_id', $selectedFurnitureId)
             ->update([
                 'qty' => $qty,
                 'total_price' => $total_price
@@ -75,10 +74,11 @@ class CatalogController extends Controller
 
         }else{
             // dd('Does not exist');
-            $this->createCart($user, $payloadFurniture, $preorder, $furnitureSelected);
+            $this->createCart($user, $selectedFurnitureId, $preorder, $furnitureSelected);
 
         }
 
+        return redirect()->back();
 
     }
 
