@@ -87,29 +87,47 @@
                 class="bg-base-200 border-2 border-green-400 h-full text-accent-content bg-center m-2 mx-10 card shadow-xl rounded-md"
             >
                 <div
-                    class="w-auto h-full grid grid-cols-4 gap-2 grid-rows-2 m-2"
+                    class="border-2 border-green-500 w-auto h-full grid grid-cols-6 gap-1 grid-rows-2 m-2"
                 >
                     <div
                         v-for="furniture in paginatedFurnitures"
                         :key="furniture.uuid"
-                        class="card rounded-md items-center text-center h-fit shadow-sm hover:shadow-xl hover:border-2 hover:border-neutral w-auto m-2 p-5 flex flex-col"
+                        class="border-2 border-yellow-400 card rounded-md items-center h-fit shadow-sm hover:shadow-xl hover:border-2 hover:border-neutral w-fit m-2 p-5 flex flex-col"
                     >
-                        <div class="items-center">
+                        <div>
                             <img
                                 :src="image + furniture.image"
                                 alt=""
                                 class="w-[100px] h-[100px]"
                             />
-                            <h1 class="p-1 text-wrap">
+                            <h1
+                                class="font-semibold text-center text-md p-1 text-wrap"
+                            >
                                 {{ furniture.description }}
                             </h1>
-                            <h1 class="p-1 text-wrap">
-                                Color: {{ furniture.color }}
-                            </h1>
-                            <h1 class="p-1 text-wrap">
-                                Ready stock : {{ furniture.stock }}
-                            </h1>
-                            <h2 class="p-1">${{ furniture.price }}</h2>
+                            <div class="text-sm">
+                                <div>
+                                    <h1 class="font-bold">Dimentions :</h1>
+                                    <p>
+                                        {{ furniture.width }} x
+                                        {{ furniture.depth }} x
+                                        {{ furniture.height }} cm
+                                    </p>
+                                </div>
+                                <div>
+                                    <h1 class="font-bold">Materials :</h1>
+                                    <p>{{ furniture.wood_type }}</p>
+                                </div>
+                                <h1 class="p-1 text-wrap">
+                                    Color: {{ furniture.color }}
+                                </h1>
+                                <h1 class="p-1 text-wrap">
+                                    Ready stock : {{ furniture.stock }}
+                                </h1>
+                                <h2 class="p-1 text-center font-bold">
+                                    ${{ furniture.price }}
+                                </h2>
+                            </div>
                             <button
                                 @click="
                                     addToCart(
@@ -163,7 +181,7 @@ export default {
         const user = props.user;
         // const furnitures = ref(props.furnitures);
         const currentPage = ref(1);
-        const itemsPerPage = ref(5);
+        const itemsPerPage = ref(10);
         // console.log(state);
         const cartCount = props.cartCounts;
         console.log(props.cartCounts);
