@@ -110,7 +110,7 @@
                                     <h1 class="font-bold">Dimentions :</h1>
                                     <p>
                                         {{ furniture.width }} x
-                                        {{ furniture.depth }} x
+                                        {{ furniture.length }} x
                                         {{ furniture.height }} cm
                                     </p>
                                 </div>
