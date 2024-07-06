@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Faker\Factory as Faker;
+use App\Models\OrdersAddress;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
@@ -27,6 +28,10 @@ class Order extends Model
 
     public function ordersProduction(){
         $this->hasOne(OrdersProduction::class);
+    }
+
+    public function ordersAddress(){
+        $this->hasOne(OrdersAddress::class);
     }
 
     // protected static function boot()
