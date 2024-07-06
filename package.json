@@ -19,6 +19,10 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
-        "sweetalert2": "^11.10.8"
+        "country-region-data": "^3.0.0",
+        "sweetalert2": "^11.10.8",
+        "vue-i18n": "^10.0.0-beta.2",
+        "vue3-country-region-select": "^1.0.0",
+        "vue3-country-region-select-mod": "^1.0.4"
     }
 }
