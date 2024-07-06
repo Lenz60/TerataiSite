@@ -307,7 +307,12 @@ export default {
         },
         checkout() {
             // console.log(this.carts[0].total_price);
-            router.post(route("cart.checkout"), {
+            // router.post(route("cart.checkout"), {
+            //     _method: "post",
+            //     cart: this.carts,
+            //     totalPrice: this.total,
+            // });
+            router.post(route("checkout.index"), {
                 _method: "post",
                 cart: this.carts,
                 totalPrice: this.total,

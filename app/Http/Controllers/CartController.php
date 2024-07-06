@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use Inertia\Inertia;
 use App\Models\Order;
+use App\Models\Furniture;
 use App\Models\OrderItems;
 use App\Models\OrdersPayment;
 use App\Models\OrdersProduction;
@@ -18,7 +19,7 @@ class CartController extends Controller
         $cart = DB::table('cart')
         ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
         ->join('users', 'cart.user_id', '=', 'users.uuid')
-        ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.price', 'cart.qty','cart.total_price' )
+        ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.wood_type','furniture.price', 'cart.qty','cart.total_price' )
         ->orderBy('cart.created_at', 'desc')
         ->get();
         // dd($cart);
@@ -56,14 +57,16 @@ class CartController extends Controller
         // dd($request->change);
         $change = $request->change;
         $cartItem = Cart::find($request->cartId);
+        $furniture = Furniture::find($cartItem->furniture_id);
 
-        // dd($cartItem);
         if($cartItem){
             if($change === 'add'){
                 $cartItem->qty = $cartItem->qty +1;
+                $cartItem->total_price = $furniture->price * $cartItem->qty;
                 $cartItem->save();
             }else{
                 $cartItem->qty = $cartItem->qty -1;
+                $cartItem->total_price = $furniture->price * $cartItem->qty;
                 $cartItem->save();
             }
         }else{
