@@ -119,32 +119,73 @@
                                 >
                                     <h1 class="p-1 text-wrap">Color:</h1>
 
-                                    <div v-for="color in furniture.color">
-                                        <div class="flex flex-row">
-                                            <label class="label cursor-pointer">
-                                                <input
-                                                    type="radio"
-                                                    :name="
-                                                        'radio' + furniture.code
-                                                    "
-                                                    :value="color"
-                                                    class="radio radio-sm"
-                                                    :style="{
-                                                        color: color,
-                                                        background: color,
-                                                    }"
-                                                    @change="
-                                                        selectedColor(
-                                                            $event,
+                                    <div
+                                        v-for="(
+                                            color, index
+                                        ) in furniture.color"
+                                        :key="furniture.uuid"
+                                    >
+                                        <div v-if="furniture.color.length > 1">
+                                            <div class="flex flex-row">
+                                                <label
+                                                    class="label cursor-pointer"
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        name="
+                                                            radioMultiple
+                                                        "
+                                                        :value="color"
+                                                        class="radio radio-sm"
+                                                        :style="{
+                                                            color: color,
+                                                            background: color,
+                                                        }"
+                                                        @change="
+                                                            selectedColor(
+                                                                $event
+                                                            )
+                                                        "
+                                                        :checked="
+                                                            color[0] ===
+                                                            furniture.color[0]
+                                                        "
+                                                    />
+                                                    <!-- <p>{{ radioMultiple }}</p> -->
+                                                    <!-- <p>{{ colorSelected }}</p> -->
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div v-else>
+                                            <div class="flex flex-row">
+                                                <label
+                                                    class="label cursor-pointer"
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        :name="
+                                                            'radio' +
                                                             furniture.code
-                                                        )
-                                                    "
-                                                    :checked="
-                                                        color ===
-                                                        furniture.color[0]
-                                                    "
-                                                />
-                                            </label>
+                                                        "
+                                                        :value="color"
+                                                        class="radio radio-sm"
+                                                        :style="{
+                                                            color: color,
+                                                            background: color,
+                                                        }"
+                                                        @change="
+                                                            selectedColor(
+                                                                $event,
+                                                                furniture.code
+                                                            )
+                                                        "
+                                                        :checked="
+                                                            color ==
+                                                            furniture.color[0]
+                                                        "
+                                                    />
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -213,7 +254,8 @@ export default {
         // const furnitures = ref(props.furnitures);
         const currentPage = ref(1);
         const itemsPerPage = ref(10);
-        const colorSelected = ref([]);
+        const colorSelected = ref("");
+        const radioMultiple = ref("");
         // console.log(state);
         const cartCount = props.cartCounts;
         console.log(props.furnitures.length);
@@ -248,6 +290,7 @@ export default {
             changePage,
             cartCount,
             colorSelected,
+            radioMultiple,
         };
     },
     computed: {
@@ -266,11 +309,11 @@ export default {
                     grouped[furniture.code].color = Array.from(colors); // Convert the set back to an array
                 }
             });
-            console.log(Object.values(grouped));
+            // console.log(Object.values(grouped));
 
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            console.log(start, end);
+            // console.log(start, end);
             return Object.values(grouped).slice(start, end);
             // return Object.values(grouped);
         },
@@ -287,16 +330,21 @@ export default {
         },
     },
     methods: {
-        selectedColor(event, code) {
-            console.log(code);
+        selectedColor(event) {
+            console.log(event.target.value);
+            this.colorSelected = event.target.value;
+            console.log(this.colorSelected);
             //Make colorSelected an array that contains code and color based on the parameter received
-            this.colorSelected[code] = event.target.value;
+            // this.colorSelected = selectedColor;
+            // this.radioMultiple = selectedColor;
+            // console.log(this.radioMultiple);
+            // console.log(this.colorSelected);
             // this.colorSelected = event.target.value;
         },
-        getColor(code, color) {
+        getColor(color) {
             if (color.length > 1) {
-                if (color.includes(this.colorSelected[code])) {
-                    return this.colorSelected[code];
+                if (color.includes(this.colorSelected)) {
+                    return this.colorSelected;
                 } else {
                     return color[0];
                 }
@@ -305,7 +353,7 @@ export default {
             }
         },
         addToCart(code, desc, color) {
-            color = this.getColor(code, color);
+            color = this.getColor(color);
             // console.log(color);
             if (this.user) {
                 Swal.fire({
@@ -317,7 +365,7 @@ export default {
                     confirmButtonColor: "#049806",
                     toast: true,
                     position: "bottom-right",
-                    timer: 1000, // 3000 milliseconds (3 seconds)
+                    timer: 3000, // 3000 milliseconds (3 seconds)
                     timerProgressBar: true, // Display a progress bar
                     showConfirmButton: false,
                 });
@@ -330,7 +378,7 @@ export default {
                     color: color,
                 });
                 // console.log(this.colorSelected);
-                this.colorSelected = null;
+                this.colorSelected = "";
 
                 // console.log(this.colorSelected);
             } else {
