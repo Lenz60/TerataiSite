@@ -61,6 +61,24 @@
                                                 />
                                             </div>
                                             <div class="m-2">
+                                                <div class="flex flex-row">
+                                                    <InputLabel
+                                                        for="phoneNumber"
+                                                        value="Phone Number"
+                                                    />
+                                                    <span
+                                                            class="block ml-2 text-sm text-gray-700"
+                                                        >
+                                                            (Whatsapp)</span
+                                                        >
+                                                </div>
+                                                <input
+                                                    class="border-gray-300 focus:border-primary focus:ring-primary rounded-md shadow-sm w-full"
+                                                    v-model="form.phoneNumber"
+                                                    type="number"
+                                                />
+                                            </div>
+                                            <div class="m-2">
                                                 <InputLabel
                                                     for="address1"
                                                     value="Address"
@@ -68,6 +86,7 @@
                                                 <TextInput
                                                     class="w-full"
                                                     v-model="address1"
+                                                    :value="address1"
                                                     type="text"
                                                 />
                                             </div>
@@ -86,11 +105,12 @@
                                                 <TextInput
                                                     class="w-full"
                                                     v-model="address2"
+                                                    :value="address2"
                                                     type="text"
                                                 />
                                             </div>
                                             <div class="m-2 flex flex-row">
-                                                <div class="flex flex-col w-40">
+                                                <div class="flex flex-col w-44">
                                                     <InputLabel
                                                         for="country"
                                                         value="Country"
@@ -103,7 +123,6 @@
                                                         class="border-gray-300 focus:border-primary focus:ring-primary rounded-md shadow-sm"
                                                         v-model="form.country"
                                                         :country="form.country"
-                                                        topCountry="ID"
                                                     ></CountrySelect>
                                                 </div>
                                                 <div
@@ -184,7 +203,7 @@
                                             </p>
                                         </div>
                                         <div
-                                            class="text-center items-center w-full h-full"
+                                            class="text-gray-600 text-center items-center w-full h-full"
                                         >
                                             <h1>{{ cart.total_price }}</h1>
                                         </div>
@@ -214,7 +233,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { CountrySelect, RegionSelect } from "vue3-country-region-select-mod";
 export default {
     components: {
@@ -236,16 +255,20 @@ export default {
         const carts = ref(props.carts);
         const address1 = ref("");
         const address2 = ref("");
+        const address =  computed(() =>
+          address1.value + ", " + address2.value
+        )
         const form = useForm({
             name: usePage().props.auth.user.name || "",
             company: usePage().props.auth.user.company || "",
             email: usePage().props.auth.user.email || "",
-            address: address1.value + address2.value,
+            phoneNumber: "",
+            address: "",
             country: "",
             region: "",
             zip: "",
         });
-        return { form, address1, address2, carts, totalPrice };
+        return { form, address1, address2, carts, totalPrice,address };
     },
     computed: {
         formattedCarts() {
@@ -259,6 +282,7 @@ export default {
     },
     methods: {
         checkout() {
+            this.form.address = this.address;
             console.log(this.form);
         },
     },
