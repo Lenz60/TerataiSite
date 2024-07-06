@@ -175,10 +175,11 @@
                             </div>
                         </div>
                         <div class="mx-5 w-[40%] flex flex-col">
-                            <div class="">
-                                <h1 class="text-xl font-semibold text-gray-600">
+                            <div class="  flex flex-row w-full">
+                                <h1 class="w-full text-xl font-semibold text-gray-600">
                                     Your cart
                                 </h1>
+                                <h1 class="w-6 h-6 mt-0.5 mb-1 text-center justify-center items-center text-base-100 font-semibold bg-primary rounded-full">{{ cartCounts }}</h1>
                             </div>
                             <div
                                 class="rounded-md bg-base-100 w-full shadow-xl"
@@ -248,7 +249,7 @@ export default {
         CountrySelect,
         RegionSelect,
     },
-    props: ["carts", "totalPrice"],
+    props: ["carts", "totalPrice", "cartCounts"],
     setup(props) {
         console.log(props.cart);
         const totalPrice = ref(props.totalPrice);

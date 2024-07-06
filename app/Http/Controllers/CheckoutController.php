@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia; // Add this line to import the Inertia facade
 
 class CheckoutController extends Controller
@@ -28,9 +29,11 @@ class CheckoutController extends Controller
         // ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.wood_type','furniture.price', 'cart.qty','cart.total_price' )
         // ->orderBy('cart.created_at', 'desc')
         // ->get();
+        $user = Auth::user();
+        $cartCounts = DB::table('cart')->where('user_id', $user->uuid)->count();
         $cart  = $request->cart;
         $totalPrice = $request->totalPrice;
 
-        return Inertia::render('Checkout/Checkout',['carts' => $cart, 'totalPrice' => $totalPrice]);
+        return Inertia::render('Checkout/Checkout',['carts' => $cart, 'totalPrice' => $totalPrice, 'cartCounts' => $cartCounts]);
     }
 }
