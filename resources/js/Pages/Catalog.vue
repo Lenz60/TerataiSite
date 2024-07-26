@@ -196,13 +196,26 @@
                                     Ready stock : {{ furniture.stock }}
                                 </h1> -->
                                 <div v-if="furniture.price.length > 1">
-                                    <h2 class="p-1 text-center font-bold">
-                                        ${{ furniture.price }}
-                                    </h2>
+                                    <div
+                                        v-for="(
+                                            price, index
+                                        ) in furniture.price"
+                                    >
+                                        <p
+                                            class="p-1 justify-center text-start font-bold"
+                                        >
+                                            {{
+                                                furniture.color[
+                                                    index
+                                                ].toString()
+                                            }}
+                                            : ${{ price }}
+                                        </p>
+                                    </div>
                                 </div>
                                 <div v-else>
                                     <h2 class="p-1 text-center font-bold">
-                                        ${{ furniture.price }}
+                                        ${{ furniture.price[0] }}
                                     </h2>
                                 </div>
                             </div>
@@ -360,10 +373,10 @@ export default {
 
             this.colorIndex = index;
             console.log("color index : ", this.colorIndex);
-            console.log(this.colorSelectedArray);
+            console.log(this.colorSelectedArray[0]);
         },
         getColor(code, color) {
-            if (this.colorSelectedArray.furnitureCode == code) {
+            if (this.colorSelectedArray[0].furnitureCode == code) {
                 if (color.length > 1) {
                     return color[this.colorIndex];
                 } else {
