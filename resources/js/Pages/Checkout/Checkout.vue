@@ -67,10 +67,10 @@
                                                         value="Phone Number"
                                                     />
                                                     <span
-                                                            class="block ml-2 text-sm text-gray-700"
-                                                        >
-                                                            (Whatsapp)</span
-                                                        >
+                                                        class="block ml-2 text-sm text-gray-700"
+                                                    >
+                                                        (Whatsapp)</span
+                                                    >
                                                 </div>
                                                 <input
                                                     class="border-gray-300 focus:border-primary focus:ring-primary rounded-md shadow-sm w-full"
@@ -175,11 +175,17 @@
                             </div>
                         </div>
                         <div class="mx-5 w-[40%] flex flex-col">
-                            <div class="  flex flex-row w-full">
-                                <h1 class="w-full text-xl font-semibold text-gray-600">
+                            <div class="flex flex-row w-full">
+                                <h1
+                                    class="w-full text-xl font-semibold text-gray-600"
+                                >
                                     Your cart
                                 </h1>
-                                <h1 class="w-6 h-6 mt-0.5 mb-1 text-center justify-center items-center text-base-100 font-semibold bg-primary rounded-full">{{ cartCounts }}</h1>
+                                <h1
+                                    class="w-6 h-6 mt-0.5 mb-1 text-center justify-center items-center text-base-100 font-semibold bg-primary rounded-full"
+                                >
+                                    {{ cartCounts }}
+                                </h1>
                             </div>
                             <div
                                 class="rounded-md bg-base-100 w-full shadow-xl"
@@ -202,6 +208,9 @@
                                             <p class="text-sm">
                                                 Materials: {{ cart.wood_type }}
                                             </p>
+                                        </div>
+                                        <div>
+                                            <h1>{{ cart.qty }}</h1>
                                         </div>
                                         <div
                                             class="text-gray-600 text-center items-center w-full h-full"
@@ -233,7 +242,7 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
-import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import { Head, Link, useForm, usePage, router } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 import { CountrySelect, RegionSelect } from "vue3-country-region-select-mod";
 export default {
@@ -256,9 +265,7 @@ export default {
         const carts = ref(props.carts);
         const address1 = ref("");
         const address2 = ref("");
-        const address =  computed(() =>
-          address1.value + ", " + address2.value
-        )
+        const address = computed(() => address1.value + ", " + address2.value);
         const form = useForm({
             name: usePage().props.auth.user.name || "",
             company: usePage().props.auth.user.company || "",
@@ -269,7 +276,7 @@ export default {
             region: "",
             zip: "",
         });
-        return { form, address1, address2, carts, totalPrice,address };
+        return { form, address1, address2, carts, totalPrice, address };
     },
     computed: {
         formattedCarts() {
@@ -284,7 +291,18 @@ export default {
     methods: {
         checkout() {
             this.form.address = this.address;
-            console.log(this.form);
+            // console.log(this.form);
+            // router.post(route("checkout.create"), {
+            //     _method: "post",
+            //     form: this.form,
+            // });
+            // this.form.post(route("checkout.create"));
+            router.post(route("checkout.create"), {
+                _method: "post",
+                info: this.form,
+                cart: this.carts,
+                totalPrice: this.totalPrice,
+            });
         },
     },
 };
