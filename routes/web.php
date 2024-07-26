@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function (){
     // Route::get('/checkout', [CheckoutController::class,'index2'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class,'index'])->name('checkout.index');
+    Route::post('/checkout/proceed', [CheckoutController::class,'create'])->name('checkout.create');
 });
 
 
