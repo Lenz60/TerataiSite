@@ -123,8 +123,9 @@
                                         v-for="(
                                             color, index
                                         ) in furniture.color"
-                                        :key="furniture.uuid"
+                                        :key="index"
                                     >
+                                        <p>{{ color }}</p>
                                         <div v-if="furniture.color.length > 1">
                                             <div class="flex flex-row">
                                                 <label
@@ -143,11 +144,13 @@
                                                         }"
                                                         @change="
                                                             selectedColor(
-                                                                $event
+                                                                $event,
+                                                                furniture.code,
+                                                                index
                                                             )
                                                         "
                                                         :checked="
-                                                            color[0] ===
+                                                            color ==
                                                             furniture.color[0]
                                                         "
                                                     />
@@ -192,9 +195,16 @@
                                 <!-- <h1 class="p-1 text-wrap">
                                     Ready stock : {{ furniture.stock }}
                                 </h1> -->
-                                <h2 class="p-1 text-center font-bold">
-                                    ${{ furniture.price }}
-                                </h2>
+                                <div v-if="furniture.price.length > 1">
+                                    <h2 class="p-1 text-center font-bold">
+                                        ${{ furniture.price }}
+                                    </h2>
+                                </div>
+                                <div v-else>
+                                    <h2 class="p-1 text-center font-bold">
+                                        ${{ furniture.price }}
+                                    </h2>
+                                </div>
                             </div>
                             <div
                                 class="items-center justify-center text-center"
@@ -254,8 +264,10 @@ export default {
         // const furnitures = ref(props.furnitures);
         const currentPage = ref(1);
         const itemsPerPage = ref(10);
-        const colorSelected = ref("");
+        const colorSelectedArray = ref([]);
         const radioMultiple = ref("");
+        const priceIndex = ref(0);
+        const colorIndex = ref(0);
         // console.log(state);
         const cartCount = props.cartCounts;
         console.log(props.furnitures.length);
@@ -289,8 +301,10 @@ export default {
             totalPages,
             changePage,
             cartCount,
-            colorSelected,
+            colorSelectedArray,
             radioMultiple,
+            priceIndex,
+            colorIndex,
         };
     },
     computed: {
@@ -302,18 +316,22 @@ export default {
                 if (!grouped[furniture.code]) {
                     grouped[furniture.code] = furniture;
                     grouped[furniture.code].color = [furniture.color]; // Wrap the color in an array
+                    grouped[furniture.code].price = [furniture.price]; // Wrap the color in an array
                 } else {
                     let colors = new Set(grouped[furniture.code].color);
+                    let prices = new Set(grouped[furniture.code].price);
                     // console.log(colors.toLowerCase);
                     colors.add(furniture.color); // Add the color to the set
+                    prices.add(furniture.price); // Add the color to the set
                     grouped[furniture.code].color = Array.from(colors); // Convert the set back to an array
+                    grouped[furniture.code].price = Array.from(prices); // Convert the set back to an array
                 }
             });
             // console.log(Object.values(grouped));
 
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            // console.log(start, end);
+            // console.log(Object.values(grouped).slice(start, end));
             return Object.values(grouped).slice(start, end);
             // return Object.values(grouped);
         },
@@ -330,21 +348,24 @@ export default {
         },
     },
     methods: {
-        selectedColor(event) {
-            console.log(event.target.value);
-            this.colorSelected = event.target.value;
-            console.log(this.colorSelected);
-            //Make colorSelected an array that contains code and color based on the parameter received
-            // this.colorSelected = selectedColor;
-            // this.radioMultiple = selectedColor;
-            // console.log(this.radioMultiple);
-            // console.log(this.colorSelected);
-            // this.colorSelected = event.target.value;
+        selectedColor(event, furnitureCode, index) {
+            const color = event.target.value;
+            const colorObject = { furnitureCode, color };
+            if (this.colorSelectedArray.length > 0) {
+                this.colorSelectedArray = [];
+                this.colorSelectedArray.push(colorObject);
+            } else {
+                this.colorSelectedArray.push(colorObject);
+            }
+
+            this.colorIndex = index;
+            console.log("color index : ", this.colorIndex);
+            console.log(this.colorSelectedArray);
         },
-        getColor(color) {
-            if (color.length > 1) {
-                if (color.includes(this.colorSelected)) {
-                    return this.colorSelected;
+        getColor(code, color) {
+            if (this.colorSelectedArray.furnitureCode == code) {
+                if (color.length > 1) {
+                    return color[this.colorIndex];
                 } else {
                     return color[0];
                 }
@@ -353,7 +374,7 @@ export default {
             }
         },
         addToCart(code, desc, color) {
-            color = this.getColor(color);
+            color = this.getColor(code, color);
             // console.log(color);
             if (this.user) {
                 Swal.fire({
