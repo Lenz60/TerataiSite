@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItems;
+use App\Models\OrderItemsProduction;
 use App\Models\OrdersInfo;
 use Illuminate\Http\Request;
 use App\Models\OrdersPayment;
@@ -63,9 +64,11 @@ class CheckoutController extends Controller
             }else{
                 $preorder = 'true';
             }
+            $orderItemsId = fake()->uuid;
 
             OrderItems::create([
                 //TODO: add Original price in OrderItems table
+                'id'  => $orderItemsId,
                 'order_id' => $orderId,
                 'user_id' => $cart['user_id'],
                 'furniture_id'=>$cart['furniture_id'],
@@ -75,6 +78,15 @@ class CheckoutController extends Controller
                 'total_price' => $cart['total_price'],
                 'track_code' => 'TRK'.rand(1000,9999),
             ]);
+
+            // OrdersProduction::create([
+            //     'order_id' => $orderId,
+            //     'production_status' => 'In Production',
+            // ]);
+            OrderItemsProduction::create([
+                'order_items_id' => $orderItemsId,
+                'production_status' => 'In Production',
+            ]);
         }
         OrdersPayment::create([
             'order_id' => $orderId,
@@ -82,10 +94,6 @@ class CheckoutController extends Controller
             'payment_status' => 'pending',
         ]);
 
-        OrdersProduction::create([
-            'order_id' => $orderId,
-            'production_status' => 'In Production',
-        ]);
 
         OrdersInfo::create([
             'order_id' => $orderId,

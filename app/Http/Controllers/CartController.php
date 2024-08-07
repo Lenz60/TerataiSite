@@ -99,6 +99,7 @@ class CartController extends Controller
 
             OrderItems::create([
                 //TODO: add Original price in OrderItems table
+                'id' => fake()->uuid,
                 'order_id' => $orderId,
                 'user_id' => $cart['user_id'],
                 'furniture_id'=>$cart['furniture_id'],
