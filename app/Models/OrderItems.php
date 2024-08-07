@@ -16,6 +16,7 @@ class OrderItems extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'id',
         'order_id',
         'user_id',
         'furniture_id',
@@ -26,13 +27,13 @@ class OrderItems extends Model
     ];
 
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($model) {
-            $faker = Faker::create();
-            $model->id = $faker->uuid;
-        });
-    }
+    //     static::creating(function ($model) {
+    //         $faker = Faker::create();
+    //         $model->id = $faker->uuid;
+    //     });
+    // }
 }

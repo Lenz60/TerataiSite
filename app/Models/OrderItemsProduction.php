@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Faker\Factory as Faker;
 
-class OrdersProduction extends Model
+class OrderItemsProduction extends Model
 {
     use HasFactory;
-    protected $table = 'orders_production';
+    protected $table = 'order_items_production';
     protected $primaryKey = 'id';
 
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id',
-        'order_id',
+        // 'id',
+        'order_items_id',
         'production_status'
     ];
 
