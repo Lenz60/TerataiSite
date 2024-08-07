@@ -376,7 +376,10 @@ export default {
             console.log(this.colorSelectedArray[0]);
         },
         getColor(code, color) {
-            if (this.colorSelectedArray[0].furnitureCode == code) {
+            if (
+                this.colorSelectedArray[0] &&
+                this.colorSelectedArray[0].furnitureCode == code
+            ) {
                 if (color.length > 1) {
                     return color[this.colorIndex];
                 } else {
