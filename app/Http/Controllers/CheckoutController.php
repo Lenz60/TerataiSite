@@ -45,13 +45,15 @@ class CheckoutController extends Controller
     }
 
     public function create(Request $request){
-        // dd($request->all());
+        $user = Auth::user();
         $info = $request->info;
         $carts = $request->cart;
         $orderId = fake()->uuid;
         $totalOrderPrice = $request->totalPrice;
+        // dd($user->uuid);
         Order::create([
             'id' => $orderId,
+            'user_id'=> $user->uuid,
             'total_price' => $totalOrderPrice,
             'track_code' => 'TRK'.rand(1000,9999),
         ]);
@@ -70,7 +72,6 @@ class CheckoutController extends Controller
                 //TODO: add Original price in OrderItems table
                 'id'  => $orderItemsId,
                 'order_id' => $orderId,
-                'user_id' => $cart['user_id'],
                 'furniture_id'=>$cart['furniture_id'],
                 'preorder'=>$preorder,
                 'price' => $cart['price'],
@@ -90,13 +91,16 @@ class CheckoutController extends Controller
         }
         OrdersPayment::create([
             'order_id' => $orderId,
-            'payment_method' => 'pending',
-            'payment_status' => 'pending',
+            'payment_method' => 'Pending',
+            'payment_status' => 'Pending',
         ]);
 
 
         OrdersInfo::create([
             'order_id' => $orderId,
+            'name'=> $info['name'],
+            'company' => $info['company'],
+            'email' => $info['email'],
             'phone_number' => $info['phoneNumber'],
             'address' => $info['address'],
             'country' => $info['country'],
@@ -104,6 +108,20 @@ class CheckoutController extends Controller
             'zip' => $info['zip'],
         ]);
 
-        return redirect()->back()->with('message', 'checkout:200');
+
+            $clearCart = $this->deleteCart($carts);
+            if($clearCart){
+                return redirect()->route('cart.index');
+            }
+
+        // return redirect()->route('cart.destroy');
+    }
+    public function deleteCart($carts){
+        foreach ($carts as $cart){
+                $deleteCart = DB::table('cart')
+                ->where('id', $cart['id'])
+                ->delete();
+        }
+        return $deleteCart;
     }
 }
