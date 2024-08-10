@@ -1,4 +1,5 @@
 <template>
+    <Head title="Cart" />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -159,10 +160,12 @@ import { ref, computed, watch, onMounted } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 import { onUpdated } from "vue";
+import { Head } from "@inertiajs/vue3";
 export default {
     props: ["carts", "checkoutStatus"],
     components: {
         AuthenticatedLayout,
+        Head,
     },
     filters: {},
     setup(props) {
