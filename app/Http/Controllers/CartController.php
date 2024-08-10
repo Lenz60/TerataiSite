@@ -77,7 +77,7 @@ class CartController extends Controller
 
 
     public function checkout(Request $request){
-        // dd($request->all());
+        dd($request->all());
         // dd($request->all());
         $carts = $request->cart;
         $orderId = fake()->uuid;
