@@ -6,10 +6,15 @@ import backgroundImage from "../../assets/background/background.jpg";
 
 <template>
     <div
-        class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100"
+        class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-[#e7e7e5]"
         :style="{
             backgroundImage: `url(${backgroundImage})`,
             backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'bottom',
+            // marginTop: '-20px'
+            paddingBottom: '135px',
+            // backgroundPositionY: 'bottom',
         }"
     >
         <div>
