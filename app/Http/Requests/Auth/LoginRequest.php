@@ -50,6 +50,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if($this->boolean('remember')) {
+            setcookie('emailRemembered', $this->string('email'), time() + (86400 * 30), "/");
+        }else{
+            setcookie('emailRemembered', '', time() - 3600, "/");
+        }
+         // Set the cookie
+
         RateLimiter::clear($this->throttleKey());
     }
 
