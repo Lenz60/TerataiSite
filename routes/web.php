@@ -29,6 +29,11 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
+Route::get('/template', function () {
+    return view('template');
+});
+
+
 
 Route::post('/catalog',[CatalogController::class, 'cart'])->name('catalog.cart');
 
@@ -62,6 +67,8 @@ Route::middleware('auth')->group(function (){
     // Route::get('/checkout', [CheckoutController::class,'index2'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class,'index'])->name('checkout.index');
     Route::post('/checkout/proceed', [CheckoutController::class,'create'])->name('checkout.create');
+    Route::get('/checkout/pdf', [CheckoutController::class,'generateInvoice'])->name('checkout.pdf');
+    Route::get('/pdf',[CheckoutController::class,  'pdf']);
 });
 
 

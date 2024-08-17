@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Furniture;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\OrderItems;
-use App\Models\OrderItemsProduction;
 use App\Models\OrdersInfo;
 use Illuminate\Http\Request;
 use App\Models\OrdersPayment;
 use App\Models\OrdersProduction;
 use Illuminate\Support\Facades\DB;
+use App\Models\OrderItemsProduction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia; // Add this line to import the Inertia facade
 
 class CheckoutController extends Controller
@@ -51,11 +54,13 @@ class CheckoutController extends Controller
         $orderId = fake()->uuid;
         $totalOrderPrice = $request->totalPrice;
         // dd($user->uuid);
+        //Generate PDF function here
         Order::create([
             'id' => $orderId,
             'user_id'=> $user->uuid,
             'total_price' => $totalOrderPrice,
             'track_code' => 'TRK'.rand(1000,9999),
+            'invoice_status' => 'Pending',
         ]);
         // dd($request->totalPrice);
         foreach($carts as $cart){
@@ -123,5 +128,32 @@ class CheckoutController extends Controller
                 ->delete();
         }
         return $deleteCart;
+    }
+
+    public function generateInvoice(){
+        // dd(resource_path('Pages/Invoice/Template.vue'));
+        $user = Auth::user();
+        $path = public_path(). '/pdf/' . $user->name .' Invoice' . '.pdf';
+        $css = file_get_contents(resource_path('css/app.css'));
+        // dd($css);
+        // $template =resource_path()->get('Pages/Invoice/Template.vue');
+        $furniture = Furniture::get();
+        $data  = [
+            'title' => 'Welcome to ItSolutionStuff.com',
+            'date' => date('m/d/Y'),
+            'furnitures' => $furniture
+        ];
+        $pdf = PDF::loadView('template', $data);
+        // $pdf = PDF::loadFile(resource_path('Pages/Invoice/Template.vue'),$data);
+        $setCss = $pdf->getCss($css);
+        $pdf->setCss($setCss);
+        $pdf->setPaper('A4', 'landscape');
+        $pdf->save($path);
+        return response()->download($path);
+        // return $pdf->download('invoice.pdf');
+    }
+
+    public function pdf(){
+        return view('template1');
     }
 }
