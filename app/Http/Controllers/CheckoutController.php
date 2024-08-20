@@ -53,16 +53,27 @@ class CheckoutController extends Controller
         $carts = $request->cart;
         $orderId = fake()->uuid;
         $totalOrderPrice = $request->totalPrice;
+        $track_code = rand(100000,999999);
         // dd($user->uuid);
         //Generate PDF function here
         Order::create([
             'id' => $orderId,
             'user_id'=> $user->uuid,
             'total_price' => $totalOrderPrice,
-            'track_code' => 'TRK'.rand(1000,9999),
+            'track_code' => $track_code,
             'invoice_status' => 'Pending',
         ]);
-        // dd($request->totalPrice);
+        $generatedInvoice = $this->generateInvoice($track_code, $orderId, $info, $carts);
+            // dd($generatedInvoice->getStatusCode() == 200);
+            $updateOrder = Order::find($orderId);
+        if($generatedInvoice->getStatusCode() == 200){
+            //* Create method to send the pdf to whatsapp
+            $updateOrder->invoice_status = 'Generated';
+            $updateOrder->save();
+        }else{
+            $updateOrder->invoice_status = 'Failed to generate';
+            $updateOrder->save();
+        }
         foreach($carts as $cart){
 
             // dd($cart['total_price']);
@@ -74,7 +85,6 @@ class CheckoutController extends Controller
             $orderItemsId = fake()->uuid;
 
             OrderItems::create([
-                //TODO: add Original price in OrderItems table
                 'id'  => $orderItemsId,
                 'order_id' => $orderId,
                 'furniture_id'=>$cart['furniture_id'],
@@ -82,13 +92,8 @@ class CheckoutController extends Controller
                 'price' => $cart['price'],
                 'qty' => $cart['qty'],
                 'total_price' => $cart['total_price'],
-                'track_code' => 'TRK'.rand(1000,9999),
             ]);
 
-            // OrdersProduction::create([
-            //     'order_id' => $orderId,
-            //     'production_status' => 'In Production',
-            // ]);
             OrderItemsProduction::create([
                 'order_items_id' => $orderItemsId,
                 'production_status' => 'In Production',
@@ -130,24 +135,47 @@ class CheckoutController extends Controller
         return $deleteCart;
     }
 
-    public function generateInvoice(){
+    public function generateInvoice($code,$orderId, $info, $carts){
         // dd(resource_path('Pages/Invoice/Template.vue'));
+        // dd($carts);
         $user = Auth::user();
-        $path = public_path(). '/pdf/' . $user->name .' Invoice' . '.pdf';
+        $orders = Order::get()->where('id', '=', $orderId)->first();
+        $path = public_path(). '/pdf/' . $user->name .' [Invoice-'. $code . ']' . '.pdf';
         $css = file_get_contents(resource_path('css/app.css'));
         // dd($css);
         // $template =resource_path()->get('Pages/Invoice/Template.vue');
         $furniture = Furniture::get();
         $data  = [
-            'title' => 'Welcome to ItSolutionStuff.com',
-            'date' => date('m/d/Y'),
-            'furnitures' => $furniture
+            'title' => 'Invoice',
+            'code' => $code,
+            'name' => $info['name'],
+            'address'=> $info['address'],
+            'country' => $info['country'],
+            'region' => $info['region'],
+            'zip' => $info['zip'],
+            'date' => $orders->created_at,
+            'furnitures' => $carts,
+            'totalPrice' => $orders->total_price
         ];
+        // !Placeholder
+        // $data  = [
+        //     'title' => 'Invoice',
+        //     'code' => "1121",
+        //     'name' => "John",
+        //     'address'=> "Jogja",
+        //     'country' => "United States",
+        //     'region' => "United States",
+        //     'zip' => "1234",
+        //     'date' => date("d-m-Y"),
+        //     'furnitures' => $furniture,
+        //     'totalPrice' => "asdasdads"
+        // ];
         $pdf = PDF::loadView('template', $data);
         // $pdf = PDF::loadFile(resource_path('Pages/Invoice/Template.vue'),$data);
         $setCss = $pdf->getCss($css);
         $pdf->setCss($setCss);
-        $pdf->setPaper('A4', 'landscape');
+        $pdf->setPaper('A4', 'portrait');
+        // return $pdf->stream();
         $pdf->save($path);
         return response()->download($path);
         // return $pdf->download('invoice.pdf');
