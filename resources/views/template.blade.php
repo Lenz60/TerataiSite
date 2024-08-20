@@ -13,61 +13,30 @@
     <div class="Header">
         <div class="invoice-header">
             <h1>Invoice to:</h1>
-            <h2>Mr.John Doe</h2>
+            <h2>{{$name}}</h2>
             <div class="invoice-address">
-                <p class="Address">Address, </p>
-                <p class="CountryEtc">Country,Region,Zip</p>
+                <p class="Address">{{$address}}</p>
+                <p class="CountryEtc">{{$country}}, {{$region}}, {{$zip}}</p>
             </div>
         </div>
         <div class="invoice-number">
             <h1>INVOICE</h1>
             <div class="invoice-code">
                 <h2 class="left">Invoice #</h2>
-                <h2 class="right">121212</h2>
+                <h2 class="right">{{$code}}</h2>
             </div>
             <div class="invoice-date">
                 <h2 class="left">Date</h2>
-                <h2 class="right">10/02/2024</h2>
+                <?php
+                    $dateObject = new DateTime($date);
+                    $convertedDate = $dateObject->format('d-m-Y');
+                ?>
+                <h2 class="right">{{$convertedDate}}</h2>
             </div>
         </div>
         <div>
         </div>
     </div>
-    <!-- <div class="customer-details">
-        <div class="customer-title">
-            <p>Customer Details</p>
-        </div>
-        <div class="customer-info">
-            <div style="width: 30%;">
-                <div class="info-row">
-                    <p class="label">Name :  John</p>
-                </div>
-                <div class="info-row">
-                    <p class="label">Company :  John</p>
-                </div>
-                <div class="info-row">
-                    <p class="label">Email  :  John</p>
-                </div>
-                <div class="info-row">
-                    <p class="label">Phone Number :  John</p>
-                </div>
-            </div>
-            <div style="width: 30%;">
-                <div class="info-row">
-                    <p class="label">Address :  John</p>
-                </div>
-                <div class="info-row">
-                    <p class="label">Country :  John</p>
-                </div>
-                <div class="info-row">
-                    <p class="label">Region  :  John</p>
-                </div>
-                <div class="info-row">
-                    <p class="label">Zip code :  John</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
     <div class="product-details">
         <div class="product-table-container">
             <table class="product-table">
@@ -81,17 +50,19 @@
                 </tr>
                 </thead>
                 <tbody>
+                    @foreach ($furnitures as $furniture )
                     <tr>
-                        <td>asd</td>
-                        <td>asd</td>
-                        <td>asd</td>
-                        <td>asd</td>
-                        <td>asd</td>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{$furniture['description']}}</td>
+                        <td>{{$furniture['qty']}}</td>
+                        <td>${{$furniture['price']}}</td>
+                        <td>${{$furniture['total_price']}}</td>
                     </tr>
+                    @endforeach
                     <tr>
                         <td colspan="3" rowspan="3" style="border: none;"></td>
                         <td>Total Price</td>
-                        <td>Rp10000</td>
+                        <td>${{$totalPrice}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -127,7 +98,6 @@
 
 .invoice-header {
     display: flex;
-    flex-direction: column;
     float: left;
 }
 
@@ -158,17 +128,18 @@
 
 .invoice-number{
     margin-top: -13.5%;
-    margin-left: 40%;
+    float: right;
     height: fit-content;
+    width:  auto;
 
 }
 .invoice-number h1{
-    display: flex;
     font-size: 3.5rem;
     font-weight: 400;
     font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     color: #333646;
     margin-bottom: -5%;
+    height: fit-content;
 }
 
 .invoice-code .left{
@@ -185,7 +156,7 @@
     font-size: 1.0rem;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333646;
-    margin-left: 80%;
+    margin-left: 60%;
     margin-bottom: -10px;
 }
 
@@ -207,7 +178,7 @@
     font-size: 1.0rem;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333646;
-    margin-left: 76%;
+    margin-left: 60%;
     margin-bottom: -10px;
 }
 
