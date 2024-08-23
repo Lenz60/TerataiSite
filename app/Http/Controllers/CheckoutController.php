@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Furniture;
 use App\Models\Order;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Session;
+use App\Models\Furniture;
 use App\Models\OrderItems;
 use App\Models\OrdersInfo;
 use Illuminate\Http\Request;
 use App\Models\OrdersPayment;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\OrdersProduction;
 use Illuminate\Support\Facades\DB;
 use App\Models\OrderItemsProduction;
@@ -30,6 +31,21 @@ class CheckoutController extends Controller
         return Inertia::render('Checkout/Checkout',['carts' => $cart]);
     }
 
+    public function getIndex(){
+        $cart = DB::table('cart')
+        ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
+        ->join('users', 'cart.user_id', '=', 'users.uuid')
+        ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.wood_type','furniture.price', 'cart.qty','cart.total_price' )
+        ->orderBy('cart.created_at', 'desc')
+        ->get();
+        // dd($cart);
+        // return Inertia::render('Cart');
+        //Add cart to the sessionstorage named cart
+        // $carts = $cart;
+        // $request->session()->put('cart', $carts);
+        return Inertia::render('Cart', ['carts' => $cart]);
+    }
+
     public function index(Request $request){
         // dd($request->all());
         // $cart = DB::table('cart')
@@ -48,6 +64,13 @@ class CheckoutController extends Controller
     }
 
     public function create(Request $request){
+        $Whatsapp = Session::first();
+        $SesId = $Whatsapp->sessionId;
+        // dd($Whatsapp);
+        $client = new \GuzzleHttp\Client();
+
+        // dd($status);
+        // dd($SesId);
         $user = Auth::user();
         $info = $request->info;
         $carts = $request->cart;
@@ -64,12 +87,43 @@ class CheckoutController extends Controller
             'invoice_status' => 'Pending',
         ]);
         $generatedInvoice = $this->generateInvoice($track_code, $orderId, $info, $carts);
-            // dd($generatedInvoice->getStatusCode() == 200);
-            $updateOrder = Order::find($orderId);
+        // $generatedInvoice->getFile()->getPath();
+            // dd($generatedInvoice->getFile()->getPathname());
+            // $filePath = $generatedInvoice->getFile()->getPath();
+            // Path to the PDF file
+        $pdfPath = public_path('pdf/' . $generatedInvoice->getFile()->getFilename());
+
+        // Read the file and encode it to base64
+        $pdfData = base64_encode(file_get_contents($pdfPath));
+        $invoiceName = str_replace(' ', '%20', $generatedInvoice->getFile()->getFilename());
+        $url = asset('pdf/'. $invoiceName);
+        $updateOrder = Order::find($orderId);
         if($generatedInvoice->getStatusCode() == 200){
             //* Create method to send the pdf to whatsapp
-            $updateOrder->invoice_status = 'Generated';
-            $updateOrder->save();
+            $response = $client->request('GET','http://localhost:3000/sessions/',['headers'=> [
+                'x-api-key'  => 'testAPI',
+            ]]);
+            $body = $response->getBody()->getContents();
+            $data = json_decode($body,true);
+            $status = $data[0]['status'];
+            if($status == "connected"){
+                $response = $client->request('POST','http://localhost:3000/'.$SesId.'/messages/send',[
+                    'headers' => ['x-api-key' => 'testAPI'],
+                    'json'=> [
+                        'jid' => '6283840765667@s.whatsapp.net',
+                        'type' => 'number',
+                        'message' => ['text' => "Here is your invoice \n".$url],
+                    ],
+                ]);
+                // dd($response->getStatusCode());
+            }
+            if($response->getStatusCode() == 200){
+                $updateOrder->invoice_status = 'Sent';
+                $updateOrder->save();
+            }else {
+                $updateOrder->invoice_status = 'Generated';
+                $updateOrder->save();
+            }
         }else{
             $updateOrder->invoice_status = 'Failed to generate';
             $updateOrder->save();
@@ -140,7 +194,7 @@ class CheckoutController extends Controller
         // dd($carts);
         $user = Auth::user();
         $orders = Order::get()->where('id', '=', $orderId)->first();
-        $path = public_path(). '/pdf/' . $user->name .' [Invoice-'. $code . ']' . '.pdf';
+        $path = public_path(). '/pdf/' . $user->name .'[Invoice-'. $code . ']' . '.pdf';
         $css = file_get_contents(resource_path('css/app.css'));
         // dd($css);
         // $template =resource_path()->get('Pages/Invoice/Template.vue');
