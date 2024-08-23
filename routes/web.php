@@ -64,8 +64,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function (){
-    // Route::get('/checkout', [CheckoutController::class,'index2'])->name('checkout.index');
-    Route::post('/checkout', [CheckoutController::class,'index'])->name('checkout.index');
+    Route::get('/checkout', [CheckoutController::class,'getIndex'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class,'index'])->name('checkout.process');
     Route::post('/checkout/proceed', [CheckoutController::class,'create'])->name('checkout.create');
     Route::get('/checkout/pdf', [CheckoutController::class,'generateInvoice'])->name('checkout.pdf');
     Route::get('/pdf',[CheckoutController::class,  'pdf']);

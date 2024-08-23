@@ -336,7 +336,7 @@ export default {
             //     cart: this.carts,
             //     totalPrice: this.total,
             // });
-            router.post(route("checkout.index"), {
+            router.post(route("checkout.process"), {
                 _method: "post",
                 cart: this.carts,
                 totalPrice: this.total,
