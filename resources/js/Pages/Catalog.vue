@@ -147,7 +147,7 @@
                                     class="w-full flex items-center justify-center"
                                 >
                                     <img
-                                        class="w-[100px] h-[100px] object-contain"
+                                        class="w-[100px] h-[100px] object-contain rounded-md"
                                         :src="
                                             'https://loremflickr.com/100/100/furniture?random=' +
                                             key
@@ -159,7 +159,7 @@
                                     class="w-full flex items-center justify-center"
                                 >
                                     <img
-                                        class="w-[100px] h-[100px] object-cover"
+                                        class="w-[100px] h-[100px] object-cover rounded-md"
                                         :src="image + furniture.image"
                                     />
                                 </div>
