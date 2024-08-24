@@ -1,8 +1,8 @@
 <template>
     <Navbar :CartCount="cartCounts"></Navbar>
-    <div class="m-2 items-center flex flex-col bg-base-100">
+    <div class="flex flex-col bg-base-100 w-full h-full">
         <!-- Hero -->
-        <div class="bg-success text-neutral-content flex w-full flex-col">
+        <div class="bg-success text-neutral-content flex w-fit flex-col">
             <div class="w-[60%] m-5 text-wrap">
                 <h1 class="indent-8 text-5xl p-2 font-semibold">Catalog</h1>
                 <p class="p-2 indent-5">
@@ -17,102 +17,167 @@
                 </p>
             </div>
         </div>
-        <div class="m-2 flex flex-col w-full">
-            <div class="flex flex-row items-center justify-center">
-                <div class="m-2 card rounded-md p-2 text-wrap w-fit h-fit">
-                    <Link :href="route('catalog.index')">
-                        <button class="btn btn-sm btn-accent h-fit w-fit">
-                            <h1 class="text-xl font-normal w-fit h-fit">All</h1>
-                        </button>
-                    </Link>
-                </div>
-                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
-                    <Link
-                        :href="
-                            route('catalog.filtered', { category: 'indoor' })
-                        "
-                    >
-                        <button class="btn btn-sm btn-neutral h-fit w-fit">
-                            <h1 class="text-xl font-normal w-fit">
-                                Indoor Furniture
-                            </h1>
-                        </button>
-                    </Link>
-                </div>
-                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
-                    <Link
-                        :href="
-                            route('catalog.filtered', { category: 'outdoor' })
-                        "
-                    >
-                        <button class="btn btn-sm btn-neutral h-fit w-fit">
-                            <h1 class="text-xl font-normal w-fit">
-                                Outdoor Furniture
-                            </h1>
-                        </button>
-                    </Link>
-                </div>
-                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
-                    <Link
-                        :href="
-                            route('catalog.filtered', {
-                                category: 'handicraft',
-                            })
-                        "
-                    >
-                        <button class="btn btn-sm btn-neutral h-fit w-fit">
-                            <h1 class="text-xl font-normal w-fit">
-                                Handicraft Furniture
-                            </h1>
-                        </button>
-                    </Link>
-                </div>
-                <div class="m-2 card rounded-sm p-2 text-wrap w-fit h-fit">
-                    <Link
-                        :href="route('catalog.filtered', { category: 'root' })"
-                    >
-                        <button class="btn btn-sm btn-neutral h-fit w-fit">
-                            <h1 class="text-xl font-normal w-fit">
-                                Root Furniture
-                            </h1>
-                        </button>
-                    </Link>
+        <div class="m-2 flex flex-row w-fit h-full">
+            <div class="w-fit flex flex-col h-full">
+                <div class="p-3">
+                    <ul>
+                        <li>
+                            <details
+                                tabindex="0"
+                                class="collapse collapse-arrow bg-base-100 rounded-md"
+                            >
+                                <summary
+                                    class="collapse-title text-md font-medium"
+                                >
+                                    Filter
+                                </summary>
+                                <ul class="p-1">
+                                    <li>
+                                        <div
+                                            class="card rounded-md p-2 text-wrap w-full h-fit"
+                                        >
+                                            <Link
+                                                :href="route('catalog.index')"
+                                            >
+                                                <h1
+                                                    class="text-sm font-normal w-fit h-fit"
+                                                >
+                                                    All
+                                                </h1>
+                                            </Link>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div
+                                            class="card rounded-sm p-2 text-wrap w-full h-fit"
+                                        >
+                                            <Link
+                                                :href="
+                                                    route('catalog.filtered', {
+                                                        category: 'indoor',
+                                                    })
+                                                "
+                                            >
+                                                <h1
+                                                    class="text-sm font-normal w-full"
+                                                >
+                                                    Indoor
+                                                </h1>
+                                            </Link>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div
+                                            class="card rounded-sm p-2 text-wrap w-full h-fit"
+                                        >
+                                            <Link
+                                                :href="
+                                                    route('catalog.filtered', {
+                                                        category: 'outdoor',
+                                                    })
+                                                "
+                                            >
+                                                <h1
+                                                    class="text-sm font-normal w-full"
+                                                >
+                                                    Outdoor
+                                                </h1>
+                                            </Link>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div
+                                            class="card rounded-sm p-2 text-wrap w-full h-fit"
+                                        >
+                                            <Link
+                                                :href="
+                                                    route('catalog.filtered', {
+                                                        category: 'handicraft',
+                                                    })
+                                                "
+                                            >
+                                                <h1
+                                                    class="text-sm font-normal w-full"
+                                                >
+                                                    Handicraft
+                                                </h1>
+                                            </Link>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div
+                                            class="card rounded-sm p-2 text-wrap w-full h-fit"
+                                        >
+                                            <Link
+                                                :href="
+                                                    route('catalog.filtered', {
+                                                        category: 'root',
+                                                    })
+                                                "
+                                            >
+                                                <h1
+                                                    class="text-sm font-normal w-full"
+                                                >
+                                                    Root
+                                                </h1>
+                                            </Link>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div
-                class="bg-base-200 h-full text-accent-content bg-center m-2 mx-10 card shadow-xl rounded-md"
+                class="bg-base-100 w-fit h-full text-accent-content bg-center m-2 mx-10 card rounded-md"
             >
-                <div
-                    class="w-auto h-full grid grid-cols-6 gap-1 grid-rows-2 m-2"
-                >
+                <div class="w-fit h-full grid grid-cols-3 gap-5 m-2">
                     <div
-                        v-for="furniture in groupedFurniture"
+                        v-for="(furniture, key) in groupedFurniture"
                         :key="furniture.uuid"
-                        class="card rounded-md items-center h-full bg-base-100 shadow-sm hover:shadow-xl hover:border-2 hover:border-neutral w-fit m-2 p-5 flex flex-col"
+                        class="card rounded-md shadow-2xl w-full items-center h-full bg-base-100 hover:shadow-2xl hover:border hover:border-neutral p-5 flex flex-col"
                     >
-                        <div>
-                            <img
-                                :src="image + furniture.image"
-                                alt=""
-                                class="w-[100px] h-[100px]"
-                            />
+                        <div class="m1 p-1 w-full items-center justify-center">
+                            <div>
+                                <div
+                                    v-if="
+                                        furniture.image.includes('placeholder')
+                                    "
+                                    class="w-full flex items-center justify-center"
+                                >
+                                    <img
+                                        class="w-[100px] h-[100px] object-contain"
+                                        :src="
+                                            'https://loremflickr.com/100/100/furniture?random=' +
+                                            key
+                                        "
+                                    />
+                                </div>
+                                <div
+                                    v-else
+                                    class="w-full flex items-center justify-center"
+                                >
+                                    <img
+                                        class="w-[100px] h-[100px] object-cover"
+                                        :src="image + furniture.image"
+                                    />
+                                </div>
+                            </div>
+
                             <h1
                                 class="font-semibold text-center text-md p-1 text-wrap"
                             >
                                 {{ furniture.description }}
                             </h1>
                             <div class="text-sm">
-                                <div>
-                                    <h1 class="font-bold">Dimentions :</h1>
-                                    <p>
+                                <div class="flex flex-row">
+                                    <h1 class="font-bold">Dimentions</h1>
+                                    <p class="pl-2">
                                         {{ furniture.width }} x
                                         {{ furniture.length }} x
                                         {{ furniture.height }} cm
                                     </p>
-                                </div>
-                                <div>
-                                    <h1 class="font-bold">Materials :</h1>
-                                    <p>{{ furniture.wood_type }}</p>
                                 </div>
                                 <div
                                     class="text-center items-center flex flex-row"
@@ -125,7 +190,6 @@
                                         ) in furniture.color"
                                         :key="index"
                                     >
-                                        <p>{{ color }}</p>
                                         <div v-if="furniture.color.length > 1">
                                             <div class="flex flex-row">
                                                 <label
@@ -144,7 +208,7 @@
                                                         }"
                                                         @change="
                                                             selectedColor(
-                                                                $event,
+                                                                value,
                                                                 furniture.code,
                                                                 index
                                                             )
@@ -154,8 +218,6 @@
                                                             furniture.color[0]
                                                         "
                                                     />
-                                                    <!-- <p>{{ radioMultiple }}</p> -->
-                                                    <!-- <p>{{ colorSelected }}</p> -->
                                                 </label>
                                             </div>
                                         </div>
@@ -163,6 +225,7 @@
                                             <div class="flex flex-row">
                                                 <label
                                                     class="label cursor-pointer"
+                                                    for="radio"
                                                 >
                                                     <input
                                                         type="radio"
@@ -192,30 +255,32 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- <h1 class="p-1 text-wrap">
-                                    Ready stock : {{ furniture.stock }}
-                                </h1> -->
-                                <div v-if="furniture.price.length > 1">
+                                <div class="flex flex-row">
                                     <div
-                                        v-for="(
-                                            price, index
-                                        ) in furniture.price"
+                                        class="p-1 bg-base-200 w-fit rounded-sm"
                                     >
-                                        <p
-                                            class="p-1 justify-center text-start font-bold"
-                                        >
-                                            {{
-                                                furniture.color[
-                                                    index
-                                                ].toString()
-                                            }}
-                                            : ${{ price }}
+                                        <p class="text-[12px]">
+                                            {{ furniture.wood_type }}
+                                        </p>
+                                    </div>
+                                    <div
+                                        v-for="color in furniture.color"
+                                        class="ml-1 p-1 bg-base-200 w-fit rounded-sm"
+                                    >
+                                        <p class="text-[12px]">
+                                            {{ color }}
                                         </p>
                                     </div>
                                 </div>
-                                <div v-else>
+
+                                <div v-if="furniture.price.length <= 1">
                                     <h2 class="p-1 text-center font-bold">
                                         ${{ furniture.price[0] }}
+                                    </h2>
+                                </div>
+                                <div v-else class="p-1">
+                                    <h2 class="p-1 text-center font-bold">
+                                        $ {{ furniture.price[colorIndex] }}
                                     </h2>
                                 </div>
                             </div>
@@ -241,7 +306,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="join justify-center items-center m-2">
+                <div class="w-fulljoin justify-center items-center m-2">
                     <button
                         v-for="page in totalPages - 1"
                         :key="page"
@@ -254,7 +319,6 @@
                 </div>
             </div>
         </div>
-        <div class="text-neutral-focus" id="custom-target"></div>
     </div>
 </template>
 
@@ -264,6 +328,7 @@ import Navbar from "@/Components/Home/Navbar.vue";
 import { router, Link } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 import { computed, ref } from "vue";
+import { onMounted } from "vue";
 export default {
     props: ["furnitures", "user", "cartCounts"],
     components: {
@@ -281,9 +346,8 @@ export default {
         const radioMultiple = ref("");
         const priceIndex = ref(0);
         const colorIndex = ref(0);
-        // console.log(state);
+        let groupedFurniture = ref([]);
         const cartCount = props.cartCounts;
-        console.log(props.furnitures.length);
 
         const paginatedFurnitures = computed(() => {
             const start = (currentPage.value - 1) * itemsPerPage.value;
@@ -304,6 +368,27 @@ export default {
             console.log(currentPage.value);
         };
 
+        onMounted(() => {
+            let grouped = {};
+            props.furnitures.forEach((furniture) => {
+                if (!grouped[furniture.code]) {
+                    grouped[furniture.code] = furniture;
+                    grouped[furniture.code].color = [furniture.color]; // Wrap the color in an array
+                    grouped[furniture.code].price = [furniture.price]; // Wrap the color in an array
+                } else {
+                    let colors = new Set(grouped[furniture.code].color);
+                    let prices = new Set(grouped[furniture.code].price);
+                    colors.add(furniture.color); // Add the color to the set
+                    prices.add(furniture.price); // Add the color to the set
+                    grouped[furniture.code].color = Array.from(colors); // Convert the set back to an array
+                    grouped[furniture.code].price = Array.from(prices); // Convert the set back to an array
+                }
+            });
+            const start = (currentPage.value - 1) * itemsPerPage.value;
+            const end = start + itemsPerPage.value;
+            groupedFurniture.value = Object.values(grouped).slice(start, end);
+        });
+
         // console.log("Total pages :" + totalPages.page);
         return {
             image,
@@ -318,62 +403,17 @@ export default {
             radioMultiple,
             priceIndex,
             colorIndex,
+            groupedFurniture,
         };
     },
-    computed: {
-        groupedFurniture() {
-            // console.log(this.furnitures);
-            let grouped = {};
-            this.furnitures.forEach((furniture) => {
-                // let colorLowercase = furniture.color.toLowerCase(); // Convert the color to lowercase
-                if (!grouped[furniture.code]) {
-                    grouped[furniture.code] = furniture;
-                    grouped[furniture.code].color = [furniture.color]; // Wrap the color in an array
-                    grouped[furniture.code].price = [furniture.price]; // Wrap the color in an array
-                } else {
-                    let colors = new Set(grouped[furniture.code].color);
-                    let prices = new Set(grouped[furniture.code].price);
-                    // console.log(colors.toLowerCase);
-                    colors.add(furniture.color); // Add the color to the set
-                    prices.add(furniture.price); // Add the color to the set
-                    grouped[furniture.code].color = Array.from(colors); // Convert the set back to an array
-                    grouped[furniture.code].price = Array.from(prices); // Convert the set back to an array
-                }
-            });
-            // console.log(Object.values(grouped));
-
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;
-            // console.log(Object.values(grouped).slice(start, end));
-            return Object.values(grouped).slice(start, end);
-            // return Object.values(grouped);
-        },
-        // ...
-
-        mergedFurniture() {
-            let merged = [...this.paginatedFurnitures];
-            this.groupedFurniture.forEach((item) => {
-                if (!merged.find((furniture) => furniture.code === item.code)) {
-                    merged.push(item);
-                }
-            });
-            return merged;
-        },
-    },
     methods: {
-        selectedColor(event, furnitureCode, index) {
-            const color = event.target.value;
+        selectedColor(color, furnitureCode, index) {
             const colorObject = { furnitureCode, color };
-            if (this.colorSelectedArray.length > 0) {
-                this.colorSelectedArray = [];
-                this.colorSelectedArray.push(colorObject);
-            } else {
-                this.colorSelectedArray.push(colorObject);
-            }
+            this.colorSelectedArray = [];
+            this.colorSelectedArray.push(colorObject);
 
             this.colorIndex = index;
-            console.log("color index : ", this.colorIndex);
-            console.log(this.colorSelectedArray[0]);
+            this.radioChange += 1;
         },
         getColor(code, color) {
             if (
@@ -395,7 +435,6 @@ export default {
             if (this.user) {
                 Swal.fire({
                     text: color + " " + desc + " added to cart",
-                    target: "#custom-target",
                     customClass: {
                         container: "position-absolute",
                     },
@@ -446,11 +485,4 @@ export default {
 };
 </script>
 
-<style scoped>
-#custom-target {
-    position: relative;
-    width: 600px;
-    height: 300px;
-    border-style: solid;
-}
-</style>
+<style scoped></style>
