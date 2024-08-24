@@ -29,16 +29,39 @@
                                 class="flex flex-row w-fill h-fit p-2 bg-white m-2 hover:border-2 hover:border-accent"
                             >
                                 <div class="w-full flex flex-row">
-                                    <img
-                                        class="w-32 h-32 p-2 rounded-lg"
-                                        :src="image + cart.image"
-                                        alt=""
-                                    />
+                                    <div
+                                        v-if="
+                                            cart.image.includes('placeholder')
+                                        "
+                                    >
+                                        <div class="w-[100px] h-[100px]">
+                                            <img
+                                                class="w-fit h-fit"
+                                                :src="
+                                                    'https://loremflickr.com/100/100/furniture?random=' +
+                                                    index
+                                                "
+                                                :alt="cart.image"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <div class="w-[100px] h-[100px]">
+                                            <img
+                                                class="w-fit h-fit"
+                                                :src="image + cart.image"
+                                                :alt="cart.image"
+                                            />
+                                        </div>
+                                    </div>
                                     <div
                                         class="flex flex-col text-center justify-center"
                                     >
                                         <!-- <h1>Table 1</h1> -->
-                                        <div v-if="cart.preorder == 1">
+                                        <div
+                                            v-if="cart.preorder == 1"
+                                            class="p-2"
+                                        >
                                             <h1 class="text-bold font-semibold">
                                                 [Pre Order]
                                             </h1>
@@ -47,7 +70,7 @@
                                             </h1>
                                             <h1>Color: {{ cart.color }}</h1>
                                         </div>
-                                        <div v-else>
+                                        <div v-else class="p-2">
                                             <h1>{{ cart.description }}</h1>
                                             <h1>Color: {{ cart.color }}</h1>
                                         </div>
