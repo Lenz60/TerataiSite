@@ -1,6 +1,6 @@
 <template>
     <div data-themes="foliage">
-        <header class="navbar bg-base-100 shadow-md w-screen">
+        <header class="navbar bg-base-100 shadow-md w-full">
             <div class="flex-none"></div>
             <div class="flex-1">
                 <a :href="route('catalog.index')">
