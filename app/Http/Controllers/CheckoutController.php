@@ -64,6 +64,7 @@ class CheckoutController extends Controller
     }
 
     public function create(Request $request){
+        // dd($request->info);
         $Whatsapp = Session::first();
         $SesId = $Whatsapp->sessionId;
         // dd($Whatsapp);
@@ -112,10 +113,13 @@ class CheckoutController extends Controller
                     'json'=> [
                         'jid' => '6283840765667@s.whatsapp.net',
                         'type' => 'number',
-                        'message' => ['text' => "Here is your invoice \n".$url],
+                        'message' => ['document' => ['url' => $url,],
+                                    "mimetype" => 'application/pdf',
+                                    "caption" => "Here is your invoice of your order at Teratai Furniture",
+                                    "fileName" => $generatedInvoice->getFile()->getFilename()],
                     ],
                 ]);
-                // dd($response->getStatusCode());
+                // dd($response->getBody()->getContents());
             }
             if($response->getStatusCode() == 200){
                 $updateOrder->invoice_status = 'Sent';
