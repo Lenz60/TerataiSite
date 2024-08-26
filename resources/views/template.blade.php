@@ -121,7 +121,7 @@
 }
 .invoice-address .CountryEtc{
     font-size: 1rem;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: DejaVu Sans, Tahoma, Geneva, Verdana, sans-serif;
     color: grey;
     margin-bottom: 10px;
 }
