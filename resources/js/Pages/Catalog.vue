@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="flex flex-row p-5 w-full h-full">
-                <div class="w-fit p-2 flex flex-col h-full">
+                <div class="w-fit p-2 flex flex-col h-full sticky top-0">
                     <div class="p-3">
                         <ul>
                             <li>
