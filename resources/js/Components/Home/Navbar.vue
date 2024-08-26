@@ -4,11 +4,10 @@
             <div class="flex-none"></div>
             <div class="flex-1">
                 <a :href="route('catalog.index')">
-                    <img
-                        src="/images/logo.png"
-                        alt=""
-                        class="btn rounded-md btn-ghost normal-case invisible xl:visible md:visible sm:invisible"
-                    />
+                    <ApplicationLogo
+                        class="block h-10 w-auto fill-current text-gray-800"
+                    >
+                    </ApplicationLogo>
                 </a>
             </div>
             <div v-if="!noAuth" class="px-5">
@@ -57,16 +56,6 @@
                                                 </p>
                                             </Link>
                                         </li>
-                                        <!-- <li>
-                                            <Link
-                                                :href="route('dashboard.admin')"
-                                                method="get"
-                                            >
-                                                <p class="text-sm text-center">
-                                                    Dashboard Admin
-                                                </p>
-                                            </Link>
-                                        </li> -->
                                         <li>
                                             <Link
                                                 :href="route('profile.edit')"
@@ -105,9 +94,11 @@
 
 <script>
 import { Link } from "@inertiajs/vue3";
+import ApplicationLogo from "../ApplicationLogo.vue";
 export default {
     components: {
         Link,
+        ApplicationLogo,
     },
     props: {
         noAuth: Object,
