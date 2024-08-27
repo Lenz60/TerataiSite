@@ -29,6 +29,7 @@
                                                     value="Name"
                                                 />
                                                 <TextInput
+                                                    required
                                                     class="w-full"
                                                     v-model="form.name"
                                                     type="text"
@@ -41,6 +42,7 @@
                                                     value="Company"
                                                 />
                                                 <TextInput
+                                                    required
                                                     class="w-full"
                                                     v-model="form.company"
                                                     type="text"
@@ -54,6 +56,7 @@
                                                     value="Email"
                                                 />
                                                 <TextInput
+                                                    required
                                                     class="w-full"
                                                     v-model="form.email"
                                                     type="text"
@@ -73,6 +76,7 @@
                                                     >
                                                 </div>
                                                 <input
+                                                    required
                                                     class="border-gray-300 focus:border-primary focus:ring-primary rounded-md shadow-sm w-full"
                                                     v-model="form.phoneNumber"
                                                     type="number"
@@ -84,6 +88,7 @@
                                                     value="Address"
                                                 />
                                                 <TextInput
+                                                    required
                                                     class="w-full"
                                                     v-model="address1"
                                                     :value="address1"
@@ -103,6 +108,7 @@
                                                     >
                                                 </div>
                                                 <TextInput
+                                                    required
                                                     class="w-full"
                                                     v-model="address2"
                                                     :value="address2"
@@ -117,6 +123,7 @@
                                                     />
                                                     <!--! Ignore the vue[warn] it will go away when its production  -->
                                                     <CountrySelect
+                                                        required
                                                         :usei18n="false"
                                                         :countryName="true"
                                                         :regionName="true"
@@ -134,6 +141,7 @@
                                                     />
                                                     <!--! Ignore the vue[warn] it will go away when its production  -->
                                                     <RegionSelect
+                                                        required
                                                         :usei18n="false"
                                                         :countryName="true"
                                                         :regionName="true"
@@ -151,6 +159,7 @@
                                                         value="Zip code"
                                                     />
                                                     <input
+                                                        required
                                                         class="border-gray-300 focus:border-primary focus:ring-primary rounded-md shadow-sm w-full"
                                                         v-model="form.zip"
                                                         type="number"
@@ -187,44 +196,62 @@
                                     {{ cartCounts }}
                                 </h1>
                             </div>
-                            <div
-                                class="rounded-md bg-base-100 w-full shadow-xl"
-                            >
+                            <div class="h-full">
                                 <div
-                                    v-for="(cart, index) in formattedCarts"
-                                    :index="index"
-                                    class=""
+                                    class="h-fit bg-base-100 rounded-md w-full shadow-xl"
                                 >
                                     <div
-                                        class="flex-row w-full inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-white"
+                                        v-for="(cart, index) in formattedCarts"
+                                        :index="index"
+                                        class=""
                                     >
-                                        <div class="w-full">
-                                            <h1 class="font-semibold">
-                                                {{ cart.description }}
-                                            </h1>
-                                            <p class="text-sm">
-                                                Color: {{ cart.color }}
-                                            </p>
-                                            <p class="text-sm">
-                                                Materials: {{ cart.wood_type }}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <h1>{{ cart.qty }}</h1>
-                                        </div>
                                         <div
-                                            class="text-gray-600 text-center items-center w-full h-full"
+                                            class="flex-row w-full w-fit inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-white"
                                         >
-                                            <h1>{{ cart.total_price }}</h1>
+                                            <div class="w-full">
+                                                <h1 class="font-semibold">
+                                                    {{ cart.description }}
+                                                </h1>
+                                                <p class="text-sm">
+                                                    Color: {{ cart.color }}
+                                                </p>
+                                                <p class="text-sm">
+                                                    Materials:
+                                                    {{ cart.wood_type }}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h1>{{ cart.qty }}</h1>
+                                            </div>
+                                            <div
+                                                class="text-gray-600 text-center items-center w-full h-full"
+                                            >
+                                                <h1>{{ cart.total_price }}</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex flex-row w-full items-center"
+                                    >
+                                        <h1 class="p-2 w-full">
+                                            Total (USD) :
+                                        </h1>
+                                        <div
+                                            class="text-center items-center w-full h-full"
+                                        >
+                                            <h1>${{ totalPrice }}</h1>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex flex-row w-full items-center">
-                                    <h1 class="p-2 w-full">Total (USD) :</h1>
-                                    <div
-                                        class="text-center items-center w-full h-full"
-                                    >
-                                        <h1>${{ totalPrice }}</h1>
+                                <div class="w-full mt-8">
+                                    <div>
+                                        <h1 class="font-bold text-sm">
+                                            Note :
+                                        </h1>
+                                        <p class="p-1 text-sm">
+                                            An active phone number is needed to
+                                            send the invoice via WhatsApp.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
