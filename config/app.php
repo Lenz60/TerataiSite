@@ -184,5 +184,14 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
+    /*
+    |--------------------------------------------------------------------------
+    | Bank Information Invoice
+    |--------------------------------------------------------------------------
+    */
+    'rekening' => env('REKENING'),
+    'atas_nama' => env('NAMA_REKENING'),
+    'bank_rekening' => env('BANK_REKENING'),
+    'nomor_konfirmasi' => env('NOMOR_KONFIRMASI')
 
 ];
