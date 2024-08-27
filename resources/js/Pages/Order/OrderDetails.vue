@@ -56,12 +56,34 @@
                                         {{ no + 1 }}
                                     </td>
                                     <td>
-                                        <div class="w-fit h-fit">
-                                            <img
-                                                class="w-20 h-20"
-                                                :src="'storage/' + items.image"
-                                                :alt="items.image"
-                                            />
+                                        <div>
+                                            <div
+                                                v-if="
+                                                    items.image.includes(
+                                                        'placeholder'
+                                                    )
+                                                "
+                                                class="w-full flex items-center justify-center"
+                                            >
+                                                <img
+                                                    class="w-[100px] h-[100px] object-contain rounded-md"
+                                                    :src="
+                                                        'https://loremflickr.com/100/100/furniture?random=' +
+                                                        key
+                                                    "
+                                                />
+                                            </div>
+                                            <div
+                                                v-else
+                                                class="w-full flex items-center justify-center"
+                                            >
+                                                <img
+                                                    class="w-[100px] h-[100px] object-cover rounded-md"
+                                                    :src="
+                                                        'storage/' + items.image
+                                                    "
+                                                />
+                                            </div>
                                         </div>
                                     </td>
                                     <td>{{ items.description }}</td>
