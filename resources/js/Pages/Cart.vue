@@ -196,6 +196,8 @@ export default {
         const image = "http://inventory.test/storage/";
         const carts = ref(props.carts);
 
+        console.log(usePage().props.flash.message);
+
         const total = ref(0);
         const totalIndivPrice = ref(0);
 
@@ -218,13 +220,16 @@ export default {
             { deep: true }
         );
 
-        onUpdated(() => {
+        onUpdated(() => {});
+
+        onMounted(() => {
+            calculateTotal();
             if (usePage().props.flash.message == "checkout:200") {
                 Swal.fire({
                     icon: "success",
-                    title: "Furniture checkout successfully",
-                    showConfirmButton: false,
-                    timer: 1500,
+                    title: "Furniture Ordered Successfully",
+                    text: "The invoice sent to your whatsapp number",
+                    showConfirmButton: true,
                 });
                 // Get all furnitureId in the carts
                 let furnitureIds = carts.value.map((cart) => cart.furniture_id);
@@ -238,30 +243,30 @@ export default {
                     _method: "delete",
                     uuid: furnitureIds,
                 });
-                // Update sessionStorage with the updated carts value
-                // sessionStorage.setItem("carts", JSON.stringify(carts.value));
-                // Update the total price to 0
                 total.value = 0;
-                // // Update total_price of each cart item to totalIndivPrice
-                // carts.value.forEach((cart) => {
-                //     cart.total_price = totalIndivPrice.value;
-                // });
-            }
-        });
+                usePage().props.flash.message = "";
+            } else if (usePage().props.flash.message == "checkout:401") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Furniture Ordered Successfully",
+                    text: "The invoice will be sent to your whatsapp number, Please check it periodically",
+                    showConfirmButton: true,
+                });
 
-        onMounted(() => {
-            calculateTotal();
-            //Removed local storage, now any changes directly apply to the database
-            // try {
-            //     const storedCarts = JSON.parse(sessionStorage.getItem("carts"));
-            //     if (storedCarts && storedCarts.length > 0) {
-            //         carts.value = storedCarts;
-            //     } else {
-            //         calculateTotal();
-            //     }
-            // } catch (error) {
-            //     console.log("Error parsing stored carts:", error);
-            // }
+                // Get all furnitureId in the carts
+                let furnitureIds = carts.value.map((cart) => cart.furniture_id);
+                // Remove all furnitureId in the carts
+                furnitureIds.forEach((furnitureId) => {
+                    carts.value = carts.value.filter(
+                        (cart) => cart.furniture_id !== furnitureId
+                    );
+                });
+                router.post(route("cart.destroy"), {
+                    _method: "delete",
+                    uuid: furnitureIds,
+                });
+                total.value = 0;
+            }
         });
 
         return {
