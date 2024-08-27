@@ -24,6 +24,7 @@
                                         <th>Track Code</th>
                                         <th>Payment Status</th>
                                         <th>Detail Info</th>
+                                        <th>Invoice</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,6 +67,14 @@
                                                 Detail Info
                                             </button>
                                         </td>
+                                        <td
+                                            @click.stop
+                                            @click="downloadInvoice(order.id)"
+                                        >
+                                            <button class="btn btn-primary">
+                                                Download
+                                            </button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -95,6 +104,8 @@ import { Head } from "@inertiajs/vue3";
 import { ref } from "vue";
 import InfoModal from "@/Pages/Order/OrderInfo.vue";
 import ItemsModal from "@/Pages/Order/OrderDetails.vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { onMounted } from "vue";
 export default {
     components: {
         Head,
@@ -108,6 +119,18 @@ export default {
         const selectedOrderInfo = ref([]);
         const itemsModal = ref(false);
         const infoModal = ref(false);
+
+        onMounted(() => {
+            if (usePage().props.flash.message == "order:404") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Invoice not found",
+                    text: "Invoice file is not found please contact administrator",
+                    showConfirmButton: true,
+                });
+                usePage().props.flash.message = "";
+            }
+        });
         return { infoModal, itemsModal, selectedOrderInfo, selectedOrderItems };
     },
     methods: {
@@ -141,6 +164,12 @@ export default {
                 console.log(this.selectedOrderInfo);
                 this.infoModal = !this.infoModal;
             }
+        },
+        downloadInvoice(orderId) {
+            router.post(route("orders.invoice"), {
+                _method: "POST",
+                Id: orderId,
+            });
         },
     },
 };
