@@ -1,6 +1,11 @@
 <template>
     <div class="w-full">
-        <Navbar class="w-full" :CartCount="cartCounts"></Navbar>
+        <div v-if="detailsModal">
+            <Navbar class="w-full" :CartCount="0"></Navbar>
+        </div>
+        <div v-else>
+            <Navbar class="w-full" :CartCount="cartCounts"></Navbar>
+        </div>
         <div class="flex flex-col bg-base-100 w-full h-full">
             <!-- Hero -->
             <div class="bg-success text-neutral-content flex w-fit flex-col">
@@ -316,23 +321,35 @@
                                     </div>
                                 </div>
                                 <div
-                                    class="items-center justify-center text-center"
+                                    class="flex flex-row justify-between text-center"
                                 >
-                                    <button
-                                        @click="
-                                            addToCart(
-                                                furniture.code,
-                                                furniture.description,
-                                                furniture.color
-                                            )
-                                        "
-                                        class="btn btn-success rounded-md p-2"
-                                    >
-                                        <div v-if="furniture.stock > 0">
-                                            Add to cart
-                                        </div>
-                                        <div v-else>Pre order</div>
-                                    </button>
+                                    <div class="w-[50%] px-1">
+                                        <button
+                                            class="btn btn-info btn-md w-full btn-outline rounded-sm p-2"
+                                            @click="
+                                                showDetailModal(furniture.uuid)
+                                            "
+                                        >
+                                            <div>Details</div>
+                                        </button>
+                                    </div>
+                                    <div class="w-[50%] px-1">
+                                        <button
+                                            @click="
+                                                addToCart(
+                                                    furniture.code,
+                                                    furniture.description,
+                                                    furniture.color
+                                                )
+                                            "
+                                            class="btn btn-success btn-outline btn-md w-full rounded-sm p-2"
+                                        >
+                                            <div v-if="furniture.stock > 0">
+                                                Add to cart
+                                            </div>
+                                            <div v-else>Pre order</div>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -355,11 +372,19 @@
             </div>
         </div>
     </div>
+    <div v-if="detailsModal">
+        <DetailsModal
+            @close="showDetailModal()"
+            :FurnitureDetails="selectedDetails"
+            :User="user"
+        ></DetailsModal>
+    </div>
 </template>
 
 <script>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Navbar from "@/Components/Home/Navbar.vue";
+import DetailsModal from "@/Pages/Catalog/Details.vue";
 import { router, Link } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 import { computed, ref, watch } from "vue";
@@ -370,6 +395,7 @@ export default {
         AuthenticatedLayout,
         Navbar,
         Link,
+        DetailsModal,
     },
     setup(props) {
         const image = "http://inventory.test/storage/";
@@ -385,6 +411,9 @@ export default {
         const cartCount = props.cartCounts;
         let totalPages = ref([]);
         let paginatedFurnitures = ref([]);
+
+        const detailsModal = ref(false);
+        const selectedDetails = ref([]);
 
         onMounted(() => {
             let grouped = {};
@@ -434,6 +463,7 @@ export default {
             itemsPerPage,
             totalPages,
             paginatedFurnitures,
+            selectedDetails,
             changePage,
             cartCount,
             colorSelectedArray,
@@ -441,6 +471,7 @@ export default {
             priceIndex,
             colorIndex,
             groupedFurniture,
+            detailsModal,
         };
     },
     methods: {
@@ -517,6 +548,16 @@ export default {
             }
             // console.log(this.state);
             // console.log(uuid, desc);
+        },
+        showDetailModal(furnitureId) {
+            if (furnitureId == "") {
+                this.detailsModal = !this.detailsModal;
+            } else {
+                this.detailsModal = !this.detailsModal;
+                this.selectedDetails = this.paginatedFurnitures.filter(
+                    (furniture) => furniture.uuid === furnitureId
+                );
+            }
         },
     },
 };
