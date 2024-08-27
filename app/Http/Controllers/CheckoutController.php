@@ -65,8 +65,12 @@ class CheckoutController extends Controller
 
     public function create(Request $request){
         // dd($request->info);
-        $Whatsapp = Session::first();
-        $SesId = $Whatsapp->sessionId;
+        $whatsapp = Session::first();
+        if($whatsapp){
+            $sessionId = $whatsapp->sessionId;
+        }else{
+            $sessionId = null;
+        }
         // dd($Whatsapp);
         $client = new \GuzzleHttp\Client();
 
@@ -88,45 +92,49 @@ class CheckoutController extends Controller
             'invoice_status' => 'Pending',
         ]);
         $generatedInvoice = $this->generateInvoice($track_code, $orderId, $info, $carts);
-        // $generatedInvoice->getFile()->getPath();
-            // dd($generatedInvoice->getFile()->getPathname());
-            // $filePath = $generatedInvoice->getFile()->getPath();
-            // Path to the PDF file
-        $pdfPath = public_path('pdf/' . $generatedInvoice->getFile()->getFilename());
+        // dd($generatedInvoice);
 
-        // Read the file and encode it to base64
-        $pdfData = base64_encode(file_get_contents($pdfPath));
         $invoiceName = str_replace(' ', '%20', $generatedInvoice->getFile()->getFilename());
         $url = asset('pdf/'. $invoiceName);
         $updateOrder = Order::find($orderId);
         if($generatedInvoice->getStatusCode() == 200){
-            //* Create method to send the pdf to whatsapp
-            $response = $client->request('GET','http://localhost:3000/sessions/',['headers'=> [
-                'x-api-key'  => 'testAPI',
-            ]]);
-            $body = $response->getBody()->getContents();
-            $data = json_decode($body,true);
-            $status = $data[0]['status'];
-            if($status == "connected"){
-                $response = $client->request('POST','http://localhost:3000/'.$SesId.'/messages/send',[
-                    'headers' => ['x-api-key' => 'testAPI'],
-                    'json'=> [
-                        'jid' => '6283840765667@s.whatsapp.net',
-                        'type' => 'number',
-                        'message' => ['document' => ['url' => $url,],
-                                    "mimetype" => 'application/pdf',
-                                    "caption" => "Here is your invoice of your order at Teratai Furniture",
-                                    "fileName" => $generatedInvoice->getFile()->getFilename()],
-                    ],
-                ]);
-                // dd($response->getBody()->getContents());
-            }
-            if($response->getStatusCode() == 200){
-                $updateOrder->invoice_status = 'Sent';
-                $updateOrder->save();
-            }else {
+            if($sessionId){
+                //* Create method to send the pdf to whatsapp
+                $response = $client->request('GET','http://localhost:3000/sessions/',['headers'=> [
+                    'x-api-key'  => 'testAPI',
+                ]]);
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body,true);
+                $status = $data[0]['status'];
+                // dd($status);
+                if($status == "connected"){
+                    $response = $client->request('POST','http://localhost:3000/'.$sessionId.'/messages/send',[
+                        'headers' => ['x-api-key' => 'testAPI'],
+                        'json'=> [
+                            'jid' => '6283840765667@s.whatsapp.net',
+                            'type' => 'number',
+                            'message' => ['document' => ['url' => $url,],
+                                        "mimetype" => 'application/pdf',
+                                        "caption" => "Here is your invoice of your order at Teratai Furniture",
+                                        "fileName" => $generatedInvoice->getFile()->getFilename()],
+                        ],
+                    ]);
+                    // dd($response->getBody()->getContents());
+                    if($response->getStatusCode() == 200){
+                        $updateOrder->invoice_status = 'Sent';
+                        $updateOrder->save();
+                    }else {
+                        $updateOrder->invoice_status = 'Generated';
+                        $updateOrder->save();
+                    }
+                }else{
+                    $updateOrder->invoice_status = 'Generated';
+                    $updateOrder->save();
+                    // Remove this line
+                }
+            }else{
                 $updateOrder->invoice_status = 'Generated';
-                $updateOrder->save();
+                    $updateOrder->save();
             }
         }else{
             $updateOrder->invoice_status = 'Failed to generate';
@@ -179,12 +187,18 @@ class CheckoutController extends Controller
 
             $clearCart = $this->deleteCart($carts);
             if($clearCart){
-                return redirect()->route('cart.index');
+                // dd($updateOrder->invoice_status);
+                if($updateOrder->invoice_status == 'Generated'){
+                    return redirect()->route('cart.index')->with('message', 'checkout:401');
+                }else{
+                    return redirect()->route('cart.index')->with('message', 'checkout:200');
+                }
             }
 
         // return redirect()->route('cart.destroy');
     }
     public function deleteCart($carts){
+
         foreach ($carts as $cart){
                 $deleteCart = DB::table('cart')
                 ->where('id', $cart['id'])
@@ -200,13 +214,11 @@ class CheckoutController extends Controller
         $orders = Order::get()->where('id', '=', $orderId)->first();
         $path = public_path(). '/pdf/' . $user->name .'[Invoice-'. $code . ']' . '.pdf';
         $css = file_get_contents(resource_path('css/app.css'));
-        // dd($css);
-        // $template =resource_path()->get('Pages/Invoice/Template.vue');
-        $furniture = Furniture::get();
         $data  = [
             'title' => 'Invoice',
             'code' => $code,
             'name' => $info['name'],
+            'company' => $info['company'],
             'address'=> $info['address'],
             'country' => $info['country'],
             'region' => $info['region'],
