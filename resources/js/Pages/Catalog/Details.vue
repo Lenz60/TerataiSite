@@ -176,7 +176,7 @@ export default {
         closeModal() {
             this.$emit("close");
         },
-        addToCart(code, desc, color) {
+        async addToCart(code, desc, color) {
             // console.log(color);
             if (this.user) {
                 Swal.fire({
@@ -204,7 +204,7 @@ export default {
 
                 // console.log(this.colorSelected);
             } else {
-                const result = Swal.fire({
+                const result = await Swal.fire({
                     title: "You are not logged in",
                     text: "If you want to add this item to your cart, please login first",
                     icon: "info",
