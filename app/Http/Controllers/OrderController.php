@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Termwind\Components\Raw;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
     //
     public function index(){
         $user = Auth::user();
-
-
         $orders = DB::table('orders')
             ->join('order_items', 'orders.id', '=', 'order_items.order_id')
             ->join('orders_payment', 'orders_payment.order_id', '=', 'orders.id')
@@ -59,5 +61,17 @@ class OrderController extends Controller
             'order_items' => $order_items,
             'order_info' => $order_info
         ]);
+    }
+    public function invoice(Request $request){
+        $orderId = $request->Id;
+        $user = Auth::user();
+        $orders = Order::get()->where('id', '=', $orderId)->first();
+        $code = $orders->track_code;
+        $fileName =  $user->name .'[Invoice-'. $code . ']' . '.pdf';
+        $path = '/pdf/' . $fileName;
+        $fileUrl = asset($path);
+
+        return response()->redirectTo($fileUrl);
+
     }
 }
