@@ -14,6 +14,7 @@
         <div class="invoice-header">
             <h1>Invoice to:</h1>
             <h2>{{$name}}</h2>
+            <p>{{$company}} Company</p>
             <div class="invoice-address">
                 <p class="Address">{{$address}}</p>
                 <p class="CountryEtc">{{$country}}, {{$region}}, {{$zip}}</p>
@@ -74,13 +75,13 @@
                 <h1>Payment Info: </h1>
             </div>
             <div class="bank-info">
-                <p>Account #: 123456678</p>
-                <p>A/C Name: Bpk Teratai</p>
-                <p>Bank Name: BRI</p>
+                <p>Account #: {{config('app.rekening')}}</p>
+                <p>A/C Name: {{config('app.atas_nama')}}</p>
+                <p>Bank Name: {{config('app.bank_rekening')}}</p>
             </div>
             <div class="confirmation">
                 <p>After completing the payment, please send us the purchase receipt to confirm the payment on this WhatsApp number</p>
-                <p class="whatsapp-number">+628348793234</p>
+                <p class="whatsapp-number">{{config('app.nomor_konfirmasi')}}</p>
             </div>
         </div>
     </div>
@@ -111,7 +112,13 @@
     font-size: 1.1rem;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333646;
-    margin-bottom: -10px;
+    margin-bottom: -15px;
+}
+.invoice-header p{
+    font-size: 1rem;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: grey;
+    margin-bottom: -15px;
 }
 .invoice-address .Address{
     font-size: 1rem;
