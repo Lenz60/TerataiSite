@@ -97,59 +97,63 @@ class CheckoutController extends Controller
         $invoiceName = str_replace(' ', '%20', $generatedInvoice->getFile()->getFilename());
         $url = asset('pdf/'. $invoiceName);
         $updateOrder = Order::find($orderId);
-        if($generatedInvoice->getStatusCode() == 200){
-            if($sessionId){
-                //* Create method to send the pdf to whatsapp
-                $response = $client->request('GET','http://localhost:3000/sessions/',['headers'=> [
-                    'x-api-key'  => 'testAPI',
-                ]]);
-                $body = $response->getBody()->getContents();
-                $data = json_decode($body,true);
-                $status = $data[0]['status'];
-                // dd($status);
-                if($status == "connected"){
-                    $response = $client->request('POST','http://localhost:3000/'.$sessionId.'/messages/send',[
-                        'headers' => ['x-api-key' => 'testAPI'],
-                        'json'=> [
-                            'jid' => '6283840765667@s.whatsapp.net',
-                            'type' => 'number',
-                            'message' => ['document' => ['url' => $url,],
-                                        "mimetype" => 'application/pdf',
-                                        "caption" => "Here is your invoice of your order at Teratai Furniture",
-                                        "fileName" => $generatedInvoice->getFile()->getFilename()],
-                        ],
-                    ]);
-                    // dd($response->getBody()->getContents());
-                    if($response->getStatusCode() == 200){
-                        $updateOrder->invoice_status = 'Sent';
-                        $updateOrder->save();
-                    }else {
-                        $updateOrder->invoice_status = 'Generated';
-                        $updateOrder->save();
-                    }
-                }else{
-                    $updateOrder->invoice_status = 'Generated';
-                    $updateOrder->save();
-                    // Remove this line
-                }
-            }else{
-                $updateOrder->invoice_status = 'Generated';
-                    $updateOrder->save();
-            }
-        }else{
-            $updateOrder->invoice_status = 'Failed to generate';
+        if(!$sessionId){
+            $updateOrder->invoice_status = 'Generated';
             $updateOrder->save();
+            $this->addOrderDetails($orderId, $carts, $info);
+            $this->handleCartClear($updateOrder, $carts);
+            return;
         }
-        foreach($carts as $cart){
+        $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
+        $body = $response->getBody()->getContents();
+        $data = json_decode($body,true);
+        if(count($data)<=1){
+            $updateOrder->invoice_status = 'Generated';
+            $updateOrder->save();
+            $this->addOrderDetails($orderId, $carts, $info);
+            $this->handleCartClear($updateOrder, $carts);
+            return;
+        }
 
-            // dd($cart['total_price']);
-            if($cart['preorder']==0){
-                $preorder = 'false';
-            }else{
-                $preorder = 'true';
-            }
+        $status = $data[0]['status'];
+        if($status !== 'connected'){
+            $updateOrder->invoice_status = 'Generated';
+            $updateOrder->save();
+            $this->addOrderDetails($orderId, $carts, $info);
+            $this->handleCartClear($updateOrder, $carts);
+            return;
+        }
+
+        $response = $client->request('POST', 'http://localhost:3000/' . $sessionId . '/messages/send', [
+            'headers' => ['x-api-key' => 'testAPI'],
+            'json' => [
+                'jid' => '6283840765667@s.whatsapp.net',
+                'type' => 'number',
+                'message' => [
+                    'document' => ['url' => $url],
+                    'mimetype' => 'application/pdf',
+                    'caption' => "Here is your invoice of your order at Teratai Furniture",
+                    'fileName' => $generatedInvoice->getFile()->getFilename()
+                ],
+            ],
+        ]);
+        if ($response->getStatusCode() == 200) {
+            $updateOrder->invoice_status = 'Sent';
+        } else {
+            $updateOrder->invoice_status = 'Generated';
+        }
+
+        $updateOrder->save();
+        $this->addOrderDetails($orderId, $carts, $info);
+        $this->handleCartClear($updateOrder, $carts);
+    }
+
+    private function addOrderDetails($orderId, $carts, $info){
+        foreach ($carts as $cart) {
+            $preorder = $cart['preorder'] == 0 ? 'false' : 'true';
             $orderItemsId = fake()->uuid;
 
+            // Add OrderItems
             OrderItems::create([
                 'id'  => $orderItemsId,
                 'order_id' => $orderId,
@@ -160,18 +164,21 @@ class CheckoutController extends Controller
                 'total_price' => $cart['total_price'],
             ]);
 
-            OrderItemsProduction::create([
+            // Add OrderItemsProduction
+                OrderItemsProduction::create([
                 'order_items_id' => $orderItemsId,
                 'production_status' => 'In Production',
             ]);
         }
+
+        // Add OrdersPayment
         OrdersPayment::create([
             'order_id' => $orderId,
             'payment_method' => 'Pending',
             'payment_status' => 'Pending',
         ]);
 
-
+        // Add OrdersInfo
         OrdersInfo::create([
             'order_id' => $orderId,
             'name'=> $info['name'],
@@ -183,20 +190,21 @@ class CheckoutController extends Controller
             'region' => $info['region'],
             'zip' => $info['zip'],
         ]);
-
-
-            $clearCart = $this->deleteCart($carts);
-            if($clearCart){
-                // dd($updateOrder->invoice_status);
-                if($updateOrder->invoice_status == 'Generated'){
-                    return redirect()->route('cart.index')->with('message', 'checkout:401');
-                }else{
-                    return redirect()->route('cart.index')->with('message', 'checkout:200');
-                }
-            }
-
-        // return redirect()->route('cart.destroy');
     }
+
+    private function handleCartClear($updateOrder, $carts){
+        $clearCart = $this->deleteCart($carts);
+        if (!$clearCart) {
+            return;
+        }
+
+        if ($updateOrder->invoice_status == 'Generated') {
+            return redirect()->route('cart.index')->with('message', 'checkout:401');
+        } else {
+            return redirect()->route('cart.index')->with('message', 'checkout:200');
+        }
+    }
+
     public function deleteCart($carts){
 
         foreach ($carts as $cart){
