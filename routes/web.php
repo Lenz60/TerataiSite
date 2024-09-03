@@ -72,5 +72,7 @@ Route::middleware('auth')->group(function (){
     // Route::get('/pdf',[CheckoutController::class,  'pdf']);
 });
 
+Route::get('/testInvoice', [OrderController::class, 'testInvoice']);
+
 
 require __DIR__.'/auth.php';
