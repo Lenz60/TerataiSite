@@ -2,6 +2,7 @@
 
 use App\Models\Order;
 use Barryvdh\DomPDF\PDF;
+use Dompdf\Dompdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,7 +25,7 @@ if(!function_exists("generateInvoice")){
             ->join('furniture', 'order_items.furniture_id', '=', 'furniture.uuid')
             ->join('users', 'orders.user_id', '=', 'users.uuid')
             ->where('orders.id', '=', $order_id)
-            ->select('users.name','order_items.furniture_id', 'furniture.description','furniture.color',
+            ->select('order_items.id as id','users.name','order_items.furniture_id', 'furniture.description','furniture.color',
                             'order_items.price', 'order_items.qty', 'order_items.total_price')
             // ->orderBy('order_items.created_at','desc')
             // ->groupBy('orders.id', 'order_items.user_id')
@@ -40,26 +41,66 @@ if(!function_exists("generateInvoice")){
             ->first();
 
         $user = Auth::user();
+        // dd($info);
         // dd($orders);
+        // dd($order_items);
         $code = $orders->track_code;
         $orders = Order::get()->where('id', '=', $order_id)->first();
         $path = public_path(). '/pdf/' . $user->name .'[Invoice-'. $code . ']' . '.pdf';
         $css = file_get_contents(resource_path('css/app.css'));
+
+        $orderItemsArray = $order_items->toArray();
+        // dd($orderItemsArray);
+        // $infoArray = $info->toArray();
+        $infoArray = [
+            'name' => $info->name,
+            'company' => $info->company,
+            'address' => $info->address,
+            'country' => $info->country,
+            'region' => $info->region,
+            'zip' => $info->zip
+        ];
+        $transformedCarts = array_map(function($item) {
+            return [
+                'id' => $item->id,
+                'description' => $item->description,
+                'qty' => $item->qty,
+                'price' => $item->price,
+                'color' => $item->color,
+                'total_price' => $item->total_price
+            ];
+        }, $orderItemsArray);
+        // dd($orderItemsArray);
+
         $data  = [
             'title' => 'Invoice',
             'code' => $code,
-            'name' => $info->name,
-            'company' => $info->company,
-            'address'=> $info->address,
-            'country' => $info->country,
-            'region' => $info->region,
-            'zip' => $info->zip,
+            'name' => $infoArray['name'],
+            'company' => $infoArray['company'],
+            'address'=> $infoArray['address'],
+            'country' => $infoArray['country'],
+            'region' => $infoArray['region'],
+            'zip' => $infoArray['zip'],
             'date' => $orders->created_at,
-            'furnitures' => $order_items,
+            'furnitures' => $transformedCarts,
             'totalPrice' => $orders->total_price
         ];
+        // dd($data);
 
-        dd($data);
+        // $data  = [
+        //     'title' => 'Invoice',
+        //     'code' => $code,
+        //     'name' => $infoArray['name'],
+        //     'company' => $infoArray['company'],
+        //     'address'=> $infoArray['address'],
+        //     'country' => $infoArray['country'],
+        //     'region' => $infoArray['region'],
+        //     'zip' => $infoArray['zip'],
+        //     'date' => $orders->created_at,
+        //     'furnitures' => $order_items,
+        //     'totalPrice' => $orders->total_price
+        // ];
+        // dd($data);
 
         // !Placeholder
         // $data  = [
@@ -74,14 +115,15 @@ if(!function_exists("generateInvoice")){
         //     'furnitures' => $furniture,
         //     'totalPrice' => "asdasdads"
         // ];
-        // $pdf = PDF::loadView('template', $data);
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('template', $data);
         // // $pdf = PDF::loadFile(resource_path('Pages/Invoice/Template.vue'),$data);
-        // $setCss = $pdf->getCss($css);
-        // $pdf->setCss($setCss);
-        // $pdf->setPaper('A4', 'portrait');
+        $setCss = $pdf->getCss($css);
+        $pdf->setCss($setCss);
+        $pdf->setPaper('A4', 'portrait');
         // // return $pdf->stream();
-        // $pdf->save($path);
-        // return response()->download($path);
+        $pdf->save($path);
+        return response()->download($path);
         // logic to generate invoice using order_id
         // return invoice_number
     }
