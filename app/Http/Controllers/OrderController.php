@@ -64,14 +64,25 @@ class OrderController extends Controller
     }
     public function invoice(Request $request){
         $orderId = $request->Id;
-        $user = Auth::user();
-        $orders = Order::get()->where('id', '=', $orderId)->first();
-        $code = $orders->track_code;
-        $fileName =  $user->name .'[Invoice-'. $code . ']' . '.pdf';
-        $path = '/pdf/' . $fileName;
-        $fileUrl = asset($path);
+        // $user = Auth::user();
+        // $orders = Order::get()->where('id', '=', $orderId)->first();
+        // $code = $orders->track_code;
+        // $fileName =  $user->name .'[Invoice-'. $code . ']' . '.pdf';
+        // $path = '/pdf/' . $fileName;
+        // $fileUrl = asset($path);
 
-        return response()->redirectTo($fileUrl);
+        $invoice = generateInvoice($orderId);
+        $path = $invoice->getFile()->getPath();
+        $invoiceName = $invoice->getFile()->getFilename();
+        $url = asset('pdf/'. $invoiceName);
+        $publicUrl = public_path('pdf/'. $invoiceName);
+        $invoiceNameWeb = str_replace(' ', '%20', $invoice->getFile()->getFilename());
+        $redirectUrl = asset('pdf/'. $invoiceNameWeb);
+
+        // dd($invoice);
+
+        return Inertia::location($redirectUrl);
+        // return response()->json(['url' => $redirectUrl]);
 
     }
 
