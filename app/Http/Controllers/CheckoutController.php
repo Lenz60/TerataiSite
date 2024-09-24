@@ -13,8 +13,14 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\OrdersProduction;
 use Illuminate\Support\Facades\DB;
 use App\Models\OrderItemsProduction;
+use Exception;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ValidatedInput;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia; // Add this line to import the Inertia facade
 
 class CheckoutController extends Controller
@@ -43,27 +49,79 @@ class CheckoutController extends Controller
         //Add cart to the sessionstorage named cart
         // $carts = $cart;
         // $request->session()->put('cart', $carts);
+        // return Inertia::render('Cart', ['carts' => $cart]);
         return Inertia::render('Cart', ['carts' => $cart]);
     }
 
     public function index(Request $request){
-        // dd($request->all());
-        // $cart = DB::table('cart')
-        // ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
-        // ->join('users', 'cart.user_id', '=', 'users.uuid')
-        // ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.wood_type','furniture.price', 'cart.qty','cart.total_price' )
-        // ->orderBy('cart.created_at', 'desc')
-        // ->get();
+        //! I decided to make the checkout is can be get by default route to enable validate input
+        //! change the requests getted from cart post to a query instead of request parameters
+        $getCart = DB::table('cart')
+        ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
+        ->join('users', 'cart.user_id', '=', 'users.uuid')
+        ->select('cart.id', 'cart.user_id', 'cart.furniture_id','cart.preorder','furniture.image','furniture.description','furniture.color','furniture.wood_type','furniture.price', 'cart.qty','cart.total_price' )
+        ->orderBy('cart.created_at', 'desc')
+        ->get();
+        // dd($cart);
         $user = Auth::user();
+        // dd($cart);
+        //Foreach the cart and then sum all the total price from cart
+        $getTotalPrice = 0;
+        foreach ($getCart as $carts){
+            $getTotalPrice += $carts->total_price * $carts->qty;
+        }
+        // dd($totalPrice);
 
         $cartCounts = DB::table('cart')->where('user_id', $user->uuid)->count();
-        $cart  = $request->cart;
-        $totalPrice = $request->totalPrice;
+        if($request->cart != null){
+            $cart = $request->cart;
+            $totalPrice = $request->totalPrice;
+        }
+        $cart  = $getCart;
+        $totalPrice = $getTotalPrice;
+        // dd($cart);
 
         return Inertia::render('Checkout/Checkout',['carts' => $cart, 'totalPrice' => $totalPrice, 'cartCounts' => $cartCounts]);
     }
 
+    private function validateInput(Request $request){
+        // dd($request->info['name']);
+        $info = $request->info;
+        // dd($info);
+        return Validator::make($info, [
+            'name' => 'required',
+            'company' => 'required',
+            'email' => 'required',
+            'phoneNumber' => 'required',
+            'address' => 'required',
+            'country' => 'required',
+            'region' => 'required',
+            'zip' => 'required',
+        ]);
+        // return $validator;
+        // return $info->validate([
+        //     'name' => 'required',
+        //     'company' => 'required',
+        //     'email' => 'required',
+        //     'phoneNumber' => 'required',
+        //     'address' => 'required',
+        //     'country' => 'required',
+        //     'region' => 'required',
+        //     'zip' => 'required',
+        // ]);
+    }
+
     public function create(Request $request){
+        // dd($request->all());
+        $validate = $this->validateInput($request);
+        // dd($validate);
+        if ($validate->fails()) {
+        return back()->withErrors($validate)->withInput();
+        }
+
+
+        // dd($mergeAddress);
+
         // dd($request->info);
         $whatsapp = Session::first();
         if($whatsapp){
@@ -71,9 +129,17 @@ class CheckoutController extends Controller
         }else{
             $sessionId = null;
         }
-        // dd($Whatsapp);
+        // dd($whatsapp);
         $client = new \GuzzleHttp\Client();
 
+        try{
+            $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
+
+        }catch(Exception $e){
+            //! Return this to a message error if server is not online
+            //! or add the order anyway but set the invoice status to generated
+            dd($e->getCode());
+        }
         // dd($status);
         // dd($SesId);
         $user = Auth::user();
@@ -105,6 +171,7 @@ class CheckoutController extends Controller
             return;
         }
         $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
+
         $body = $response->getBody()->getContents();
         $data = json_decode($body,true);
         if(count($data)<=1){
@@ -127,6 +194,7 @@ class CheckoutController extends Controller
         $response = $client->request('POST', 'http://localhost:3000/' . $sessionId . '/messages/send', [
             'headers' => ['x-api-key' => 'testAPI'],
             'json' => [
+                //! Change the number to customer number
                 'jid' => '6283840765667@s.whatsapp.net',
                 'type' => 'number',
                 'message' => [
@@ -149,6 +217,7 @@ class CheckoutController extends Controller
     }
 
     private function addOrderDetails($orderId, $carts, $info){
+        $mergedAddress = $info['address'] . ', ' . $info['address2'];
         foreach ($carts as $cart) {
             $preorder = $cart['preorder'] == 0 ? 'false' : 'true';
             $orderItemsId = fake()->uuid;
@@ -185,7 +254,7 @@ class CheckoutController extends Controller
             'company' => $info['company'],
             'email' => $info['email'],
             'phone_number' => $info['phoneNumber'],
-            'address' => $info['address'],
+            'address' => $mergedAddress,
             'country' => $info['country'],
             'region' => $info['region'],
             'zip' => $info['zip'],

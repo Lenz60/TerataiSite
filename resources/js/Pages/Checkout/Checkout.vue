@@ -21,7 +21,7 @@
                                 </div>
                                 <!-- Form -->
                                 <div class="m-2">
-                                    <form class="">
+                                    <form class="" id="checkout">
                                         <div class="">
                                             <div class="m-2">
                                                 <InputLabel
@@ -34,6 +34,10 @@
                                                     v-model="form.name"
                                                     type="text"
                                                     :value="form.name"
+                                                />
+                                                <InputError
+                                                    class="mt-2 text-start"
+                                                    :message="errors['name']"
                                                 />
                                             </div>
                                             <div class="m-2">
@@ -48,6 +52,10 @@
                                                     type="text"
                                                     :value="form.company"
                                                 />
+                                                <InputError
+                                                    class="mt-2 text-start"
+                                                    :message="errors['company']"
+                                                />
                                             </div>
 
                                             <div class="m-2">
@@ -61,6 +69,10 @@
                                                     v-model="form.email"
                                                     type="text"
                                                     :value="form.email"
+                                                />
+                                                <InputError
+                                                    class="mt-2 text-start"
+                                                    :message="errors['email']"
                                                 />
                                             </div>
                                             <div class="m-2">
@@ -81,18 +93,28 @@
                                                     v-model="form.phoneNumber"
                                                     type="number"
                                                 />
+                                                <InputError
+                                                    class="mt-2 text-start"
+                                                    :message="
+                                                        errors['phoneNumber']
+                                                    "
+                                                />
                                             </div>
                                             <div class="m-2">
                                                 <InputLabel
-                                                    for="address1"
+                                                    for="address"
                                                     value="Address"
                                                 />
                                                 <TextInput
                                                     required
                                                     class="w-full"
-                                                    v-model="address1"
-                                                    :value="address1"
+                                                    v-model="form.address"
+                                                    :value="form.address"
                                                     type="text"
+                                                />
+                                                <InputError
+                                                    class="mt-2 text-start"
+                                                    :message="errors['address']"
                                                 />
                                             </div>
                                             <div class="m-2">
@@ -110,8 +132,8 @@
                                                 <TextInput
                                                     required
                                                     class="w-full"
-                                                    v-model="address2"
-                                                    :value="address2"
+                                                    v-model="form.address2"
+                                                    :value="form.address2"
                                                     type="text"
                                                 />
                                             </div>
@@ -131,6 +153,12 @@
                                                         v-model="form.country"
                                                         :country="form.country"
                                                     ></CountrySelect>
+                                                    <InputError
+                                                        class="mt-2 text-start"
+                                                        :message="
+                                                            errors['country']
+                                                        "
+                                                    />
                                                 </div>
                                                 <div
                                                     class="mx-2 flex flex-col w-40"
@@ -150,6 +178,12 @@
                                                         :country="form.country"
                                                         :region="form.region"
                                                     ></RegionSelect>
+                                                    <InputError
+                                                        class="mt-2 text-start"
+                                                        :message="
+                                                            errors['region']
+                                                        "
+                                                    />
                                                 </div>
                                                 <div
                                                     class="mx-2 flex flex-col w-[100px]"
@@ -164,6 +198,10 @@
                                                         v-model="form.zip"
                                                         type="number"
                                                     />
+                                                    <InputError
+                                                        class="mt-2 text-start"
+                                                        :message="errors['zip']"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -173,12 +211,30 @@
                                     class="border-t-1 border-gray-400 my-4 mb-4"
                                 />
                                 <div class="w-full">
-                                    <button
-                                        class="btn btn-info w-full"
-                                        @click="checkout()"
-                                    >
-                                        Continue Checkout
-                                    </button>
+                                    <div v-if="stateLoading">
+                                        <button
+                                            form="checkout"
+                                            class="btn btn-info btn-disabled cursor-pointer w-full"
+                                            type="submit"
+                                            @click="checkout()"
+                                        >
+                                            Continue Checkout
+                                        </button>
+                                    </div>
+                                    <div v-else>
+                                        <button
+                                            class="btn btn-info w-full"
+                                            type="submit"
+                                            @click="checkout()"
+                                            :class="
+                                                stateLoading
+                                                    ? 'cursor-not-allowed, btn-disabled, cursor-pointer'
+                                                    : ''
+                                            "
+                                        >
+                                            Continue Checkout
+                                        </button>
+                                    </div>
                                 </div>
                                 <!-- <div class="border-2 border-blue-500 m-2"></div> -->
                             </div>
@@ -285,28 +341,46 @@ export default {
         CountrySelect,
         RegionSelect,
     },
-    props: ["carts", "totalPrice", "cartCounts"],
+    props: ["carts", "totalPrice", "cartCounts", "errors"],
     setup(props) {
         console.log(props.cart);
         const totalPrice = ref(props.totalPrice);
         const carts = ref(props.carts);
         const address1 = ref("");
         const address2 = ref("");
-        const address = computed(() => address1.value + ", " + address2.value);
+        const stateLoading = ref(false);
+        console.log(stateLoading);
         const form = useForm({
             name: usePage().props.auth.user.name || "",
             company: usePage().props.auth.user.company || "",
             email: usePage().props.auth.user.email || "",
             phoneNumber: "",
             address: "",
+            address2: "",
             country: "",
             region: "",
             zip: "",
         });
-        return { form, address1, address2, carts, totalPrice, address };
+        // const address = computed(() => form.address + ", " + address2.value);
+        // console.log(form.errors);
+        const errorProps = props.errors;
+        const formErrors = computed(() => form.errors);
+        console.log(props.errors);
+
+        return {
+            form,
+            address1,
+            address2,
+            carts,
+            totalPrice,
+            // address,
+            stateLoading,
+            errorProps,
+        };
     },
     computed: {
         formattedCarts() {
+            console.log(this.form.errors);
             return this.carts.map((cart) => {
                 return {
                     ...cart,
@@ -317,19 +391,26 @@ export default {
     },
     methods: {
         checkout() {
-            this.form.address = this.address;
+            // this.form.address = this.form.address + "," + this.address2;
+            // console.log(this.formErrors);
             // console.log(this.form);
             // router.post(route("checkout.create"), {
             //     _method: "post",
             //     form: this.form,
             // });
             // this.form.post(route("checkout.create"));
-            router.post(route("checkout.create"), {
+            // this.stateLoading = !this.stateloading;
+            // console.log(this.stateLoading);
+            const checkout = router.post(route("checkout.create"), {
                 _method: "post",
                 info: this.form,
                 cart: this.carts,
                 totalPrice: this.totalPrice,
             });
+            // if (checkout) {
+            //     // this.stateLoading = !this.stateLoading;
+            //     // router.push(route("cart.index"));
+            // }
         },
     },
 };
