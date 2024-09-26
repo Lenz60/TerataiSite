@@ -390,7 +390,7 @@ export default {
         },
     },
     methods: {
-        checkout() {
+        async checkout() {
             // this.form.address = this.form.address + "," + this.address2;
             // console.log(this.formErrors);
             // console.log(this.form);
@@ -401,16 +401,16 @@ export default {
             // this.form.post(route("checkout.create"));
             // this.stateLoading = !this.stateloading;
             // console.log(this.stateLoading);
-            const checkout = router.post(route("checkout.create"), {
+            const checkout = await router.post(route("checkout.create"), {
                 _method: "post",
                 info: this.form,
                 cart: this.carts,
                 totalPrice: this.totalPrice,
             });
-            // if (checkout) {
-            //     // this.stateLoading = !this.stateLoading;
-            //     // router.push(route("cart.index"));
-            // }
+            if (checkout) {
+                // this.stateLoading = !this.stateLoading;
+                router.get(route("cart.index"));
+            }
         },
     },
 };
