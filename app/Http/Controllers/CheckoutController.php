@@ -54,8 +54,10 @@ class CheckoutController extends Controller
     }
 
     public function index(Request $request){
-        //! I decided to make the checkout is can be get by default route to enable validate input
-        //! change the requests getted from cart post to a query instead of request parameters
+        //! I̶ d̶e̶c̶i̶d̶e̶d̶ t̶o̶ m̶a̶k̶e̶ t̶h̶e̶ c̶h̶e̶c̶k̶o̶u̶t̶ i̶s̶ c̶a̶n̶ b̶e̶ g̶e̶t̶ b̶y̶ d̶e̶f̶a̶u̶l̶t̶ r̶o̶u̶t̶e̶ t̶o̶ e̶n̶a̶b̶l̶e̶ v̶a̶l̶i̶d̶a̶t̶e̶ i̶n̶p̶u̶t̶
+        //! c̶h̶a̶n̶g̶e̶ t̶h̶e̶ r̶e̶q̶u̶e̶s̶t̶s̶ g̶e̶t̶t̶e̶d̶ f̶r̶o̶m̶ c̶a̶r̶t̶ p̶o̶s̶t̶ t̶o̶ a̶ q̶u̶e̶r̶y̶ i̶n̶s̶t̶e̶a̶d̶ o̶f̶ r̶e̶q̶u̶e̶s̶t̶ p̶a̶r̶a̶m̶e̶t̶e̶r̶s̶
+        //v Connection check is done
+        //? Maybe refactor the code to make it more readable
         $getCart = DB::table('cart')
         ->join('furniture', 'cart.furniture_id', '=', 'furniture.uuid')
         ->join('users', 'cart.user_id', '=', 'users.uuid')
@@ -64,6 +66,10 @@ class CheckoutController extends Controller
         ->get();
         // dd($cart);
         $user = Auth::user();
+        $cartCounts = DB::table('cart')->where('user_id', $user->uuid)->count();
+        if($cartCounts <= 0){
+            return redirect()->route('cart.index');
+        }
         // dd($cart);
         //Foreach the cart and then sum all the total price from cart
         $getTotalPrice = 0;
@@ -72,7 +78,6 @@ class CheckoutController extends Controller
         }
         // dd($totalPrice);
 
-        $cartCounts = DB::table('cart')->where('user_id', $user->uuid)->count();
         if($request->cart != null){
             $cart = $request->cart;
             $totalPrice = $request->totalPrice;
@@ -132,14 +137,6 @@ class CheckoutController extends Controller
         // dd($whatsapp);
         $client = new \GuzzleHttp\Client();
 
-        try{
-            $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
-
-        }catch(Exception $e){
-            //! Return this to a message error if server is not online
-            //! or add the order anyway but set the invoice status to generated
-            dd($e->getCode());
-        }
         // dd($status);
         // dd($SesId);
         $user = Auth::user();
@@ -170,50 +167,73 @@ class CheckoutController extends Controller
             $this->handleCartClear($updateOrder, $carts);
             return;
         }
-        $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
 
-        $body = $response->getBody()->getContents();
-        $data = json_decode($body,true);
-        if(count($data)<=1){
+
+        try{
+
+            $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
+            if($response){
+                $clientStatus = true;
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body,true);
+                if(count($data)<=1){
+                    $updateOrder->invoice_status = 'Generated';
+                    $updateOrder->save();
+                    $this->addOrderDetails($orderId, $carts, $info);
+                    $this->handleCartClear($updateOrder, $carts);
+                    return;
+                }
+
+                $status = $data[0]['status'];
+                if($status !== 'connected' || $status != 'AUTHENTICATED' || $clientStatus == false){
+                    $updateOrder->invoice_status = 'Generated';
+                    $updateOrder->save();
+                    $this->addOrderDetails($orderId, $carts, $info);
+                    $this->handleCartClear($updateOrder, $carts);
+                    return;
+                }
+
+                $response = $client->request('POST', 'http://localhost:3000/' . $sessionId . '/messages/send', [
+                    'headers' => ['x-api-key' => 'testAPI'],
+                    'json' => [
+                        //! Change the number to customer number
+                        'jid' => '6283840765667@s.whatsapp.net',
+                        'type' => 'number',
+                        'message' => [
+                            'document' => ['url' => $url],
+                            'mimetype' => 'application/pdf',
+                            'caption' => "Here is your invoice of your order at Teratai Furniture",
+                            'fileName' => $generatedInvoice->getFile()->getFilename()
+                        ],
+                    ],
+                ]);
+                if ($response->getStatusCode() == 200) {
+                    $updateOrder->invoice_status = 'Sent';
+                } else {
+                    $updateOrder->invoice_status = 'Generated';
+                }
+
+                $updateOrder->save();
+                $this->addOrderDetails($orderId, $carts, $info);
+                $this->handleCartClear($updateOrder, $carts);
+
+            }
+            return redirect()->route('cart.index');
+        }catch(Exception $e){
+            //! Return this to a message error if server is not online
+            //! or add the order anyway but set the invoice status to generated
+            // dd($e->getCode());
             $updateOrder->invoice_status = 'Generated';
             $updateOrder->save();
             $this->addOrderDetails($orderId, $carts, $info);
             $this->handleCartClear($updateOrder, $carts);
             return;
         }
+        // $clientStatus=true;
+        return redirect()->route('cart.index');
 
-        $status = $data[0]['status'];
-        if($status !== 'connected'){
-            $updateOrder->invoice_status = 'Generated';
-            $updateOrder->save();
-            $this->addOrderDetails($orderId, $carts, $info);
-            $this->handleCartClear($updateOrder, $carts);
-            return;
-        }
 
-        $response = $client->request('POST', 'http://localhost:3000/' . $sessionId . '/messages/send', [
-            'headers' => ['x-api-key' => 'testAPI'],
-            'json' => [
-                //! Change the number to customer number
-                'jid' => '6283840765667@s.whatsapp.net',
-                'type' => 'number',
-                'message' => [
-                    'document' => ['url' => $url],
-                    'mimetype' => 'application/pdf',
-                    'caption' => "Here is your invoice of your order at Teratai Furniture",
-                    'fileName' => $generatedInvoice->getFile()->getFilename()
-                ],
-            ],
-        ]);
-        if ($response->getStatusCode() == 200) {
-            $updateOrder->invoice_status = 'Sent';
-        } else {
-            $updateOrder->invoice_status = 'Generated';
-        }
 
-        $updateOrder->save();
-        $this->addOrderDetails($orderId, $carts, $info);
-        $this->handleCartClear($updateOrder, $carts);
     }
 
     private function addOrderDetails($orderId, $carts, $info){
