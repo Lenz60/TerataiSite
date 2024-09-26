@@ -212,25 +212,18 @@ class CheckoutController extends Controller
                 } else {
                     $updateOrder->invoice_status = 'Generated';
                 }
-
-                $updateOrder->save();
-                $this->addOrderDetails($orderId, $carts, $info);
-                $this->handleCartClear($updateOrder, $carts);
-
             }
-            return redirect()->route('cart.index');
         }catch(Exception $e){
             //! Return this to a message error if server is not online
             //! or add the order anyway but set the invoice status to generated
             // dd($e->getCode());
             $updateOrder->invoice_status = 'Generated';
-            $updateOrder->save();
-            $this->addOrderDetails($orderId, $carts, $info);
-            $this->handleCartClear($updateOrder, $carts);
-            return;
         }
         // $clientStatus=true;
-        return redirect()->route('cart.index');
+        // return redirect()->route('cart.index');
+        $updateOrder->save();
+        $this->addOrderDetails($orderId, $carts, $info);
+        return $this->handleCartClear($updateOrder, $carts);
 
 
 
@@ -286,7 +279,7 @@ class CheckoutController extends Controller
         if (!$clearCart) {
             return;
         }
-
+        // dd($updateOrder->invoice_status);
         if ($updateOrder->invoice_status == 'Generated') {
             return redirect()->route('cart.index')->with('message', 'checkout:401');
         } else {
