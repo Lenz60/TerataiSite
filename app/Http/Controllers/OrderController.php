@@ -56,6 +56,17 @@ class OrderController extends Controller
 
             // dd($order_info);
         // dd($user->company);
+        // dd(public_path('pdf/'));
+        // delete all files inside of asset(pdf/)
+        // Storage::disk('public')->deleteDirectory('pdf');
+        $files = glob(public_path('pdf/*')); // get all file names
+        foreach ($files as $file) { // iterate files
+            if (is_file($file)) {
+                unlink($file); // delete file
+            }
+        }
+
+        // dd($order_items);
         return Inertia::render('Orders',[
             'orders' => $orders,
             'order_items' => $order_items,
@@ -70,7 +81,10 @@ class OrderController extends Controller
         // $fileName =  $user->name .'[Invoice-'. $code . ']' . '.pdf';
         // $path = '/pdf/' . $fileName;
         // $fileUrl = asset($path);
-
+        $publicStorage = public_path('pdf/');
+        if (!file_exists($publicStorage)) {
+                mkdir($publicStorage, 0755, true);
+            }
         $invoice = generateInvoice($orderId);
         $path = $invoice->getFile()->getPath();
         $invoiceName = $invoice->getFile()->getFilename();
