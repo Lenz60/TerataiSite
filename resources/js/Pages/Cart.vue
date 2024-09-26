@@ -196,7 +196,7 @@ export default {
         const image = "http://inventory.test/storage/";
         const carts = ref(props.carts);
 
-        console.log(usePage().props.flash.message);
+        // console.log(usePage().props.flash.message);
 
         const total = ref(0);
         const totalIndivPrice = ref(0);
