@@ -67,13 +67,29 @@
                                                 Detail Info
                                             </button>
                                         </td>
-                                        <td
-                                            @click.stop
-                                            @click="downloadInvoice(order.id)"
-                                        >
-                                            <button class="btn btn-primary">
-                                                Download
-                                            </button>
+                                        <td @click.stop>
+                                            <div v-if="stateLoading">
+                                                <button
+                                                    class="btn btn-primary btn-disabled"
+                                                >
+                                                    <span
+                                                        class="loading loading-spinner"
+                                                    ></span>
+                                                    loading
+                                                </button>
+                                            </div>
+                                            <div v-else>
+                                                <button
+                                                    @click="
+                                                        downloadInvoice(
+                                                            order.id
+                                                        )
+                                                    "
+                                                    class="btn btn-primary"
+                                                >
+                                                    Download
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -119,6 +135,7 @@ export default {
         const selectedOrderInfo = ref([]);
         const itemsModal = ref(false);
         const infoModal = ref(false);
+        const stateLoading = ref(false);
 
         onMounted(() => {
             if (usePage().props.flash.message == "order:404") {
@@ -131,7 +148,13 @@ export default {
                 usePage().props.flash.message = "";
             }
         });
-        return { infoModal, itemsModal, selectedOrderInfo, selectedOrderItems };
+        return {
+            infoModal,
+            itemsModal,
+            selectedOrderInfo,
+            selectedOrderItems,
+            stateLoading,
+        };
     },
     methods: {
         filterOrderItems(context, orderId) {
@@ -166,6 +189,7 @@ export default {
             }
         },
         downloadInvoice(orderId) {
+            this.stateLoading = !this.stateLoading;
             router.post(route("orders.invoice"), {
                 _method: "POST",
                 Id: orderId,
