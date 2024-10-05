@@ -115,7 +115,7 @@
                                         "
                                     >
                                         <div
-                                            class="flex flex-row w-full text-center items-center"
+                                            class="flex flex-row w-full justify-center text-center items-center"
                                         >
                                             <p>Add to cart</p>
                                             <svg
