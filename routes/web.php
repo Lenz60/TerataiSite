@@ -20,20 +20,20 @@ use App\Http\Controllers\ProfileController;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-})->name('welcome');
+// Route::get('/', function () {
+//     return Inertia::render('Dashboard', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// })->name('welcome');
 
-Route::get('/template', function () {
-    return view('template');
-});
+// Route::get('/template', function () {
+//     return view('template');
+// });
 
-
+Route::get('/', [CatalogController::class, 'index'])->name('/');
 
 Route::post('/catalog',[CatalogController::class, 'cart'])->name('catalog.cart');
 
@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function (){
     // Route::get('/pdf',[CheckoutController::class,  'pdf']);
 });
 
-Route::get('/testInvoice', [OrderController::class, 'testInvoice']);
+// Route::get('/testInvoice', [OrderController::class, 'testInvoice']);
 
 
 require __DIR__.'/auth.php';
