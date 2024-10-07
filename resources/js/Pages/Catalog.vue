@@ -156,7 +156,9 @@
                 <div
                     class="bg-base-300 p-5 w-full h-full text-accent-content bg-center rounded-md"
                 >
-                    <div class="w-fit h-full grid grid-cols-3 gap-5">
+                    <div
+                        class="w-fit h-fit grid grid-cols-6 grid-flow-row gap-5 mb-5"
+                    >
                         <div
                             v-for="(furniture, key) in paginatedFurnitures"
                             :key="furniture.uuid"
