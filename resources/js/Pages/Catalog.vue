@@ -167,7 +167,11 @@
                                 class="m1 p-1 cardSize items-center justify-center"
                             >
                                 <div>
-                                    <div
+                                    <img
+                                        class="w-[100px] h-[100px] object-cover rounded-md"
+                                        :src="image + furniture.image"
+                                    />
+                                    <!-- <div
                                         v-if="
                                             furniture.image.includes(
                                                 'placeholder'
@@ -191,7 +195,7 @@
                                             class="w-[100px] h-[100px] object-cover rounded-md"
                                             :src="image + furniture.image"
                                         />
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <h1

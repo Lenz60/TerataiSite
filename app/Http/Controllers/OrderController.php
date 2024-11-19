@@ -100,7 +100,7 @@ class OrderController extends Controller
 
     }
 
-    public function testInvoice(){
-        generateInvoice("4bfa88d4-9faf-3c08-96d6-af980e19774b");
-    }
+    // public function testInvoice(){
+    //     generateInvoice("4bfa88d4-9faf-3c08-96d6-af980e19774b");
+    // }
 }

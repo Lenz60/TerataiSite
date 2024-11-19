@@ -117,17 +117,17 @@ class CheckoutController extends Controller
     }
 
     public function create(Request $request){
-        // dd($request->all());
+        // dd($info['phoneNumber']);
         $validate = $this->validateInput($request);
         // dd($validate);
         if ($validate->fails()) {
         return back()->withErrors($validate)->withInput();
-        }
+    }
 
 
-        // dd($mergeAddress);
+    // dd($mergeAddress);
 
-        // dd($request->info);
+    // dd($request->info);
         $whatsapp = Session::first();
         if($whatsapp){
             $sessionId = $whatsapp->sessionId;
@@ -145,6 +145,8 @@ class CheckoutController extends Controller
         $orderId = fake()->uuid;
         $totalOrderPrice = $request->totalPrice;
         $track_code = rand(100000,999999);
+        $apiUrl = env('API_URL');
+        $apiKey = env('API_KEY');
         // dd($user->uuid);
         //Generate PDF function here
         Order::create([
@@ -171,7 +173,7 @@ class CheckoutController extends Controller
 
         try{
 
-            $response = $client->request('GET','http://localhost:3000/sessions/', ['headers' => ['x-api-key' => 'testAPI']]);
+            $response = $client->request('GET', $apiUrl . '/', ['headers' => ['x-api-key' => $apiKey]]);
             if($response){
                 $clientStatus = true;
                 $body = $response->getBody()->getContents();
@@ -193,11 +195,11 @@ class CheckoutController extends Controller
                     return;
                 }
 
-                $response = $client->request('POST', 'http://localhost:3000/' . $sessionId . '/messages/send', [
-                    'headers' => ['x-api-key' => 'testAPI'],
+                $response = $client->request('POST', $apiUrl . '/' . $sessionId . '/messages/send', [
+                    'headers' => ['x-api-key' => $apiKey],
                     'json' => [
                         //! Change the number to customer number
-                        'jid' => '6283840765667@s.whatsapp.net',
+                        'jid' => $info['phoneNumber'].'@s.whatsapp.net',
                         'type' => 'number',
                         'message' => [
                             'document' => ['url' => $url],
