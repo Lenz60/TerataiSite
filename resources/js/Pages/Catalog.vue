@@ -1,4 +1,5 @@
 <template>
+    <Head title="Catalog" />
     <div class="w-full">
         <div v-if="detailsModal">
             <Navbar class="w-full" :CartCount="0"></Navbar>
@@ -12,14 +13,12 @@
                 <div class="w-[60%] p-5 text-wrap">
                     <h1 class="indent-8 text-5xl p-2 font-semibold">Catalog</h1>
                     <p class="p-2 indent-5">
-                        The diverse and plentiful experience the understanding
-                        of nature of resource saving technologies directly
-                        depends on economic practicability of decisions made.
-                        Thus the established organisation structure requires the
-                        analysis of strengthening the democratic system. It
-                        should be noted that the established organisation
-                        structure allows to complete important implementation
-                        tasks of strengthening the democratic system.
+                        Discover our extensive collection of high-quality
+                        furniture designed to suit every taste and style. From
+                        modern to classic, our catalog offers a diverse range of
+                        pieces that will enhance the beauty and functionality of
+                        your home. Browse through our selection and find the
+                        perfect furniture to create your dream living space.
                     </p>
                 </div>
             </div>
@@ -387,10 +386,11 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Navbar from "@/Components/Home/Navbar.vue";
 import DetailsModal from "@/Pages/Catalog/Details.vue";
-import { router, Link } from "@inertiajs/vue3";
+import { router, Link, Head } from "@inertiajs/vue3";
 import Swal from "sweetalert2";
 import { computed, ref, watch } from "vue";
 import { onMounted } from "vue";
+
 export default {
     props: ["furnitures", "user", "cartCounts"],
     components: {
@@ -398,6 +398,7 @@ export default {
         Navbar,
         Link,
         DetailsModal,
+        Head,
     },
     setup(props) {
         const image = "http://inventory.test/storage/";
